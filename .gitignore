@@ -3,7 +3,8 @@
 [Oo]bj/
 [Bb]uild/
 [Bb]uilds/
-Assets/AssetStoreTools*
+[Rr]elease/
+
 
 # Visual Studio 2015 cache directory
 /.vs/
@@ -32,8 +33,21 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
-RapidRoll/Assets/Appodeal/
-RapidRoll/Assets/Plugins/Android/*
-!RapidRoll/Assets/Plugins/Android/mainTemplate.gradle
-!RapidRoll/Assets/Plugins/Android/mainTemplate.gradle.meta
+.DS_Store
+.thumb
 
+# blender version files
+*.blend1*
+*.blend2*
+*.blend3*
+
+
+Assets/AssetStoreTools*
+Assets/Appodeal
+Appodeal
+Assets/Appodeal/
+Assets/Plugins/Android/*
+!Assets/Plugins/Android/mainTemplate.gradle
+!Assets/Plugins/Android/mainTemplate.gradle.meta
+/Assets/Questionaires.json
+/Assets/Questionaires.json.meta
