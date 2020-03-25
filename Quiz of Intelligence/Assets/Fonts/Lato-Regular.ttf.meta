@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d778acce909c74c56bb007336800eb94
+guid: ee0f6ab2b85534d29b207a25931dbc72
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -8,9 +8,9 @@ TrueTypeFontImporter:
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
-  fontName: Alegreya Sans
+  fontName: Lato
   fontNames:
-  - Alegreya Sans
+  - Lato
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
