@@ -11,8 +11,8 @@
             <e p="Question.cs" t="Include" />
           </e>
           <e p="EnumerableExtensions.cs" t="Include" />
-          <e p="QuestionGenerator.cs" t="Include" />
-          <e p="QuestionsAnimations.cs" t="Include" />
+          <e p="GameSceneAnimations.cs" t="Include" />
+          <e p="QuestionnaireManager.cs" t="Include" />
           <e p="UiManager.cs" t="Include" />
         </e>
         <e p="Demigiant" t="Include">

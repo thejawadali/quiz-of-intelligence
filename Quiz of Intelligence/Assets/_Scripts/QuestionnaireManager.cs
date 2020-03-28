@@ -5,26 +5,33 @@ using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class QuestionGenerator : MonoBehaviour
+public class QuestionnaireManager : MonoBehaviour
 {
     #region Texts
 
-    [Header("Questions and options texts")]
-    public TextMeshProUGUI questionText;
+    [Header("Questions and options texts")] [SerializeField]
+    private TextMeshProUGUI questionsCounter_GameScene;
 
-    public TextMeshProUGUI[] answerTexts;
+    [SerializeField] private TextMeshProUGUI questionText;
 
-    [Space(12)] [Header("timer components/items")]
-    public TextMeshProUGUI timer_text;
+    [SerializeField] private TextMeshProUGUI[] answerTexts;
 
-    public Image timer_slider;
+    [Space(12)] [Header("timer components/items")] [SerializeField]
+    private TextMeshProUGUI timer_text;
+
+    [SerializeField] private Image timer_slider;
 
     #endregion
 
-    // Create a property to handle the slider's value
-    private float currentValue = 0f;
+    /// <summary>
+    /// Total question in a questionnaire 
+    /// </summary>
+    [SerializeField] [Header("Total question in a questionnaire")]
+    private float totalQuestions = 7f;
+
 
     /// <summary>
     /// Max time to solve a questions 
@@ -34,6 +41,9 @@ public class QuestionGenerator : MonoBehaviour
 
     private float minValue = 0f;
 
+    // Create a property to handle the slider's value
+    private float currentValue = 0f;
+
     public static int currentQuestion;
     private Questions questionObject;
     private Question ques;
@@ -41,10 +51,11 @@ public class QuestionGenerator : MonoBehaviour
 
     private List<int> wrongAnswersListForHint = new List<int>();
 
-    public static QuestionGenerator instance = null;
+    public static QuestionnaireManager instance = null;
 
     private void Awake()
     {
+        currentQuestion = 0;
         // singleton
         if (instance == null)
         {
@@ -64,7 +75,7 @@ public class QuestionGenerator : MonoBehaviour
     private void FixedUpdate()
     {
         // start timer only when question is fully loaded
-        if (QuestionsAnimations.gameStarted)
+        if (GameSceneAnimations.gameStarted)
         {
             // timer starts
             CurrentValue += Time.deltaTime;
@@ -101,6 +112,8 @@ public class QuestionGenerator : MonoBehaviour
             //     }
             // }
         }
+
+        questionsCounter_GameScene.text = (currentQuestion + 1) + "/" + totalQuestions;
     }
 
     /// <summary>
@@ -109,7 +122,7 @@ public class QuestionGenerator : MonoBehaviour
     public void GetNewQuestion()
     {
         GetQuestion();
-        QuestionsAnimations.instance.AnimateQuestions_IN(0.2f);
+        GameSceneAnimations.instance.AnimateQuestions_IN(0.2f);
         Reset();
     }
 
@@ -146,7 +159,7 @@ public class QuestionGenerator : MonoBehaviour
     /// <param name="isCorrect">true if answer is correct</param>
     void AnswerResponse(bool isCorrect)
     {
-        QuestionsAnimations.gameStarted = false;
+        GameSceneAnimations.gameStarted = false;
         currentQuestion++;
         // go to next question with some delay
         StartCoroutine(WaitAndAnimateQuestionsOUT());
@@ -204,13 +217,43 @@ public class QuestionGenerator : MonoBehaviour
     IEnumerator WaitAndAnimateQuestionsOUT()
     {
         yield return new WaitForSeconds(0.5f);
-        QuestionsAnimations.instance.AnimateQuestions_OUT(0.2f);
+        if (currentQuestion >= totalQuestions)
+        {
+            // show result screen
+            ShowResultScreen();
+        }
+        else
+        {
+            // continue with next question
+            GameSceneAnimations.instance.AnimateQuestions_OUT(0.2f);
+        }
+    }
+
+
+    /// <summary>
+    /// Game over, lets show result screen
+    /// </summary>
+    void ShowResultScreen()
+    {
+        GameSceneAnimations.instance.AllComponentsAnimations_OUT(0.2f,
+            () => { GameSceneAnimations.instance.ResultScreenAnimations_IN(0.2f); });
+    }
+
+
+    public void PlayAgainButton_RS()
+    {
+        GameSceneAnimations.instance.ResultScreenAnimations_OUT(0.2f, () => { SceneManager.LoadScene(1); });
+    }
+
+    public void HomeButton_RS()
+    {
+        GameSceneAnimations.instance.ResultScreenAnimations_OUT(0.2f, () => { SceneManager.LoadScene(0); });
     }
 
 
     public void AnswerButtonListeners(int index)
     {
-        if (QuestionsAnimations.gameStarted)
+        if (GameSceneAnimations.gameStarted)
         {
             Question questionObj = ques;
             switch (index)
