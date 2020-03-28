@@ -1867,7 +1867,7 @@ MonoBehaviour:
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
-  m_FillAmount: 0.35
+  m_FillAmount: 0
   m_FillClockwise: 1
   m_FillOrigin: 2
   m_UseSpriteMesh: 0
@@ -2459,6 +2459,8 @@ MonoBehaviour:
   - {fileID: 1470831912}
   - {fileID: 509368507}
   - {fileID: 1064223319}
+  timer_text: {fileID: 1140870783}
+  timer_slider: {fileID: 611354270}
 --- !u!4 &796932461
 Transform:
   m_ObjectHideFlags: 0
