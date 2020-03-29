@@ -150,9 +150,10 @@ public class GameSceneAnimations : MonoBehaviour
     {
         resultScreen.SetActive(true);
         quizScreen.SetActive(false);
+        
         coins_container.DOAnchorPosY(15, time);
         heading.DOAnchorPosY(-48f, time);
-        heading.GetComponent<CanvasGroup>().DOFade(1, time);
+        heading.GetComponent<TextMeshProUGUI>().DOFade(1, time);
         statsWindow.DOScale(Vector3.one, time);
         statsWindow.GetComponent<CanvasGroup>().DOFade(1, time);
         playAgainButton.DOAnchorPosX(0, time);
@@ -163,7 +164,7 @@ public class GameSceneAnimations : MonoBehaviour
     {
         heading.DOAnchorPosY(250f, time);
         coins_container.DOAnchorPosY(-50, time);
-        heading.GetComponent<CanvasGroup>().DOFade(0, time);
+        heading.GetComponent<TextMeshProUGUI>().DOFade(0, time);
         statsWindow.DOScale(Vector3.zero, time);
         statsWindow.GetComponent<CanvasGroup>().DOFade(0, time);
         playAgainButton.DOAnchorPosX(-700, time);

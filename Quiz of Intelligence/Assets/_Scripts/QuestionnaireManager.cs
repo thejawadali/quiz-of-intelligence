@@ -12,10 +12,16 @@ using Random = UnityEngine.Random;
 
 public class QuestionnaireManager : MonoBehaviour
 {
-    #region Texts
+    [SerializeField] private TextMeshProUGUI coins_text;
 
-    [Header("Questions and options texts")] [SerializeField]
+    [Space(12)]
+
+    #region Texts quiz screen
+
+    [Header("Questions and options texts")]
+    [SerializeField]
     private TextMeshProUGUI questionsCounter_GameScene;
+
 
     [SerializeField] private TextMeshProUGUI questionText;
 
@@ -28,6 +34,7 @@ public class QuestionnaireManager : MonoBehaviour
 
     #endregion
 
+    // [Space(12)]
     /// <summary>
     /// Total question in a questionnaire 
     /// </summary>
@@ -51,12 +58,12 @@ public class QuestionnaireManager : MonoBehaviour
     private Question ques;
     private string json;
 
-    #region Hint dt
+    #region Hint data
 
     /// <summary>
     /// list of all wrong options index
     /// </summary>
-    private List<int> wrongAnswersListForHint = new List<int>();
+    private List<int> wrongOptionsListForHint = new List<int>();
 
     /// <summary>
     /// list of wrongAnswersListForHint that have been used
@@ -69,6 +76,7 @@ public class QuestionnaireManager : MonoBehaviour
     int randomHintButton;
 
     #endregion
+
 
     private bool hintTaken = false;
 
@@ -88,6 +96,7 @@ public class QuestionnaireManager : MonoBehaviour
     {
         // set timer_text = maxValue 
         timer_text.text = maxValue.ToString("f0");
+
         // get json file
         json = File.ReadAllText(Application.dataPath + "/output.json");
         questionObject = JsonUtility.FromJson<Questions>(json);
@@ -128,9 +137,9 @@ public class QuestionnaireManager : MonoBehaviour
             // populate wrong answer
             if (!ques.answers[i].isCorrect)
             {
-                if (wrongAnswersListForHint.Count <= 3)
+                if (wrongOptionsListForHint.Count <= 3)
                 {
-                    wrongAnswersListForHint.Add(i);
+                    wrongOptionsListForHint.Add(i);
                 }
             }
         }
@@ -152,9 +161,13 @@ public class QuestionnaireManager : MonoBehaviour
     {
         hintTaken = false;
         CurrentValue = 0;
-        wrongAnswersListForHint.Clear();
+        wrongOptionsListForHint.Clear();
         usedHintNo.Clear();
-        EnableAllButtons();
+        // make all option Buttons intractable
+        foreach (var op in options)
+        {
+            op.interactable = true;
+        }
     }
 
 
@@ -193,11 +206,13 @@ public class QuestionnaireManager : MonoBehaviour
 
         if (isCorrect)
         {
+            ResultScreen.correctAnswers++;
             // correct answer
         }
         else
         {
             // wrong answer
+            ResultScreen.wrongAnswers++;
 
             // if user gave wrong answer, show him the correct answer
             for (int i = 0; i < ques.answers.Count; i++)
@@ -262,7 +277,7 @@ public class QuestionnaireManager : MonoBehaviour
     void ShowResultScreen()
     {
         GameSceneAnimations.instance.AllComponentsAnimations_OUT(0.2f,
-            () => { GameSceneAnimations.instance.ResultScreenAnimations_IN(0.2f); });
+            () => { ResultScreen.instance.GameOver(); });
     }
 
 
@@ -277,40 +292,16 @@ public class QuestionnaireManager : MonoBehaviour
             {
                 while (usedHintNo.Contains(randomHintButton))
                 {
-                    randomHintButton = Random.Range(0, wrongAnswersListForHint.Count);
+                    randomHintButton = Random.Range(0, wrongOptionsListForHint.Count);
                 }
 
                 usedHintNo.Add(randomHintButton);
-                DisableHintButton(wrongAnswersListForHint[randomHintButton]);
+                options[randomHintButton].interactable = false;
             }
         }
     }
 
-    void DisableHintButton(int buttonNo)
-    {
-        // options[buttonNo].alpha = 0.5f;
-        options[buttonNo].interactable = false;
-    }
 
-    void EnableAllButtons()
-    {
-        foreach (var op in options)
-        {
-            // op.alpha = 1;
-            op.interactable = true;
-        }
-    }
-
-
-    public void PlayAgainButton_RS()
-    {
-        GameSceneAnimations.instance.ResultScreenAnimations_OUT(0.2f, () => { SceneManager.LoadScene(1); });
-    }
-
-    public void HomeButton_RS()
-    {
-        GameSceneAnimations.instance.ResultScreenAnimations_OUT(0.2f, () => { SceneManager.LoadScene(0); });
-    }
 
 
     public void AnswerButtonListeners(int index)

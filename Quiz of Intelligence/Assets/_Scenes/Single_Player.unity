@@ -784,8 +784,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 796932460}
-        m_MethodName: HomeButton_RS
+      - m_Target: {fileID: 796932463}
+        m_MethodName: HomeButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1636,7 +1636,7 @@ GameObject:
   - component: {fileID: 565454541}
   - component: {fileID: 565454540}
   m_Layer: 5
-  m_Name: coins-text-resultScreen
+  m_Name: cur_coins-text-RS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2251,6 +2251,7 @@ GameObject:
   - component: {fileID: 796932461}
   - component: {fileID: 796932462}
   - component: {fileID: 796932460}
+  - component: {fileID: 796932463}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2270,6 +2271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abc48e19f04e94e419a47a7d58af0def, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  coins_text: {fileID: 911520429}
   questionsCounter_GameScene: {fileID: 1969794820}
   questionText: {fileID: 1149111053}
   options:
@@ -2323,6 +2325,22 @@ MonoBehaviour:
   playAgainButton: {fileID: 1241186658}
   homeButton: {fileID: 320267515}
   coins_container: {fileID: 676222527}
+--- !u!114 &796932463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 796932459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 836eb25104b794caab9bf6dde7ce27ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  points_text: {fileID: 1314807738}
+  cur_coins_count_text: {fileID: 565454540}
+  wrongAnswersText: {fileID: 1943744634}
+  correctAnswersText: {fileID: 295273853}
 --- !u!1 &806400827
 GameObject:
   m_ObjectHideFlags: 0
@@ -4457,8 +4475,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 796932460}
-        m_MethodName: PlayAgainButton_RS
+      - m_Target: {fileID: 796932463}
+        m_MethodName: PlayAgainButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
