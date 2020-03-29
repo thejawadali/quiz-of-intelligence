@@ -10,7 +10,7 @@ public class ResultScreen : MonoBehaviour
     public static int wrongAnswers;
     public static int correctAnswers;
     private int points;
-    private int cur_coins_count;
+    public static int cur_coins_count;
 
     #region Result screen data
 
@@ -42,6 +42,7 @@ public class ResultScreen : MonoBehaviour
         GameSceneAnimations.instance.ResultScreenAnimations_IN(0.2f);
         correctAnswersText.text = correctAnswers.ToString();
         wrongAnswersText.text = wrongAnswers.ToString();
+        cur_coins_count_text.text = "+"+cur_coins_count;
     }
 
 

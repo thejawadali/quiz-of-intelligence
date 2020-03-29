@@ -12,7 +12,7 @@ using Random = UnityEngine.Random;
 
 public class QuestionnaireManager : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI coins_text;
+    [SerializeField] private TextMeshProUGUI total_coins_text;
 
     [Space(12)]
 
@@ -52,8 +52,8 @@ public class QuestionnaireManager : MonoBehaviour
 
     // Create a property to handle the slider's value
     private float currentValue = 0f;
-
-    public static int currentQuestion;
+    private int totalCoins;
+    private int currentQuestion;
     private Questions questionObject;
     private Question ques;
     private string json;
@@ -94,6 +94,8 @@ public class QuestionnaireManager : MonoBehaviour
 
     void Start()
     {
+        totalCoins = PlayerPrefs.GetInt("Total_Coins");
+        total_coins_text.text = totalCoins.ToString();
         // set timer_text = maxValue 
         timer_text.text = maxValue.ToString("f0");
 
@@ -206,8 +208,13 @@ public class QuestionnaireManager : MonoBehaviour
 
         if (isCorrect)
         {
-            ResultScreen.correctAnswers++;
             // correct answer
+            totalCoins++;
+            total_coins_text.text = totalCoins.ToString();
+            ResultScreen.correctAnswers++;
+            ResultScreen.cur_coins_count++;
+            PlayerPrefs.SetInt("Total_Coins", totalCoins);
+            PlayerPrefs.Save();
         }
         else
         {
@@ -283,7 +290,7 @@ public class QuestionnaireManager : MonoBehaviour
 
     public void HintButton_QS()
     {
-        if (!hintTaken)
+        if (!hintTaken && GameSceneAnimations.gameStarted)
         {
             hintTaken = true;
 
@@ -296,12 +303,10 @@ public class QuestionnaireManager : MonoBehaviour
                 }
 
                 usedHintNo.Add(randomHintButton);
-                options[randomHintButton].interactable = false;
+                options[wrongOptionsListForHint[randomHintButton]].interactable = false;
             }
         }
     }
-
-
 
 
     public void AnswerButtonListeners(int index)

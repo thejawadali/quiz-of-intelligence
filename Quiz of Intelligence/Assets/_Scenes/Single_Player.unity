@@ -2271,7 +2271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abc48e19f04e94e419a47a7d58af0def, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  coins_text: {fileID: 911520429}
+  total_coins_text: {fileID: 911520429}
   questionsCounter_GameScene: {fileID: 1969794820}
   questionText: {fileID: 1149111053}
   options:
@@ -2281,7 +2281,7 @@ MonoBehaviour:
   - {fileID: 1623980009}
   timer_text: {fileID: 1140870783}
   timer_slider: {fileID: 611354270}
-  totalQuestions: 2
+  totalQuestions: 11
   maxValue: 20
 --- !u!4 &796932461
 Transform:
