@@ -8,7 +8,7 @@ public class GameSceneAnimations : MonoBehaviour
 {
     public GameObject quizScreen;
     public GameObject resultScreen;
-    
+
     #region Quiz screen items
 
     [Header("Quiz screen items")] [SerializeField]
@@ -85,18 +85,17 @@ public class GameSceneAnimations : MonoBehaviour
     /// <param name="time"></param>
     public void AnimateQuestions_OUT(float time)
     {
-        question_bg_image.transform.GetChild(0).GetComponent<CanvasGroup>().DOFade(0, time);
         foreach (var ops in answers)
         {
             var image = ops.transform.GetChild(1);
             image.gameObject.SetActive(false);
             image.GetComponent<Image>().color = Color.white;
 
-            ops.GetComponent<CanvasGroup>().DOFade(0, time).OnComplete(() =>
-            {
-                QuestionnaireManager.instance.GetNewQuestion();
-            });
+            ops.GetComponent<CanvasGroup>().DOFade(0, time);
         }
+
+        question_bg_image.transform.GetChild(0).GetComponent<CanvasGroup>().DOFade(0, time)
+            .OnComplete(() => { QuestionnaireManager.instance.GetNewQuestion(); });
     }
 
     #endregion
@@ -137,8 +136,9 @@ public class GameSceneAnimations : MonoBehaviour
         {
             avatar_container.DOAnchorPosX(-180, time);
             time_slider.DOScale(Vector3.zero, time);
-            hintBtn.DOAnchorPosX(-540, time);
-            coins_container.DOAnchorPosY(-50, time).OnComplete(() => { onComplete();});
+            coins_container.DOAnchorPosY(-50, time);
+            hintBtn.DOAnchorPosX(-540, time)
+                .OnComplete(() => { onComplete(); });
         });
     }
 
@@ -150,19 +150,19 @@ public class GameSceneAnimations : MonoBehaviour
     {
         resultScreen.SetActive(true);
         quizScreen.SetActive(false);
+        coins_container.DOAnchorPosY(15, time);
         heading.DOAnchorPosY(-48f, time);
         heading.GetComponent<CanvasGroup>().DOFade(1, time);
         statsWindow.DOScale(Vector3.one, time);
         statsWindow.GetComponent<CanvasGroup>().DOFade(1, time);
         playAgainButton.DOAnchorPosX(0, time);
         homeButton.DOAnchorPosX(0, time);
-        
     }
 
     public void ResultScreenAnimations_OUT(float time, Action onComplete)
     {
-        
         heading.DOAnchorPosY(250f, time);
+        coins_container.DOAnchorPosY(-50, time);
         heading.GetComponent<CanvasGroup>().DOFade(0, time);
         statsWindow.DOScale(Vector3.zero, time);
         statsWindow.GetComponent<CanvasGroup>().DOFade(0, time);

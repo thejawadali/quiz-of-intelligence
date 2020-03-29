@@ -3,10 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class QuestionnaireManager : MonoBehaviour
 {
@@ -17,7 +19,7 @@ public class QuestionnaireManager : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI questionText;
 
-    [SerializeField] private TextMeshProUGUI[] answerTexts;
+    [SerializeField] private CanvasGroup[] options;
 
     [Space(12)] [Header("timer components/items")] [SerializeField]
     private TextMeshProUGUI timer_text;
@@ -49,7 +51,26 @@ public class QuestionnaireManager : MonoBehaviour
     private Question ques;
     private string json;
 
+    #region Hint dt
+
+    /// <summary>
+    /// list of all wrong options index
+    /// </summary>
     private List<int> wrongAnswersListForHint = new List<int>();
+
+    /// <summary>
+    /// list of wrongAnswersListForHint that have been used
+    /// </summary>
+    private List<int> usedHintNo = new List<int>();
+
+    /// <summary>
+    /// random button from wrongAnswersListForHint to fade
+    /// </summary>
+    int randomHintButton;
+
+    #endregion
+
+    private bool hintTaken = false;
 
     public static QuestionnaireManager instance = null;
 
@@ -65,6 +86,8 @@ public class QuestionnaireManager : MonoBehaviour
 
     void Start()
     {
+        // set timer_text = maxValue 
+        timer_text.text = maxValue.ToString("f0");
         // get json file
         json = File.ReadAllText(Application.dataPath + "/output.json");
         questionObject = JsonUtility.FromJson<Questions>(json);
@@ -101,16 +124,15 @@ public class QuestionnaireManager : MonoBehaviour
         // answers text
         for (var i = 0; i < ques.answers.Count; i++)
         {
-            answerTexts[i].text = ques.answers[i].answerText;
-
+            options[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = ques.answers[i].answerText;
             // populate wrong answer
-            // if (!q.answers[i].isCorrect)
-            // {
-            //     if (wrongAnswersListForHint.Count <= 3)
-            //     {
-            //         wrongAnswersListForHint.Add(i);
-            //     }
-            // }
+            if (!ques.answers[i].isCorrect)
+            {
+                if (wrongAnswersListForHint.Count <= 3)
+                {
+                    wrongAnswersListForHint.Add(i);
+                }
+            }
         }
 
         questionsCounter_GameScene.text = (currentQuestion + 1) + "/" + totalQuestions;
@@ -121,14 +143,18 @@ public class QuestionnaireManager : MonoBehaviour
     /// </summary>
     public void GetNewQuestion()
     {
-        GetQuestion();
-        GameSceneAnimations.instance.AnimateQuestions_IN(0.2f);
         Reset();
+        GetQuestion();
+        GameSceneAnimations.instance.AnimateQuestions_IN(0.3f);
     }
 
     private void Reset()
     {
+        hintTaken = false;
         CurrentValue = 0;
+        wrongAnswersListForHint.Clear();
+        usedHintNo.Clear();
+        EnableAllButtons();
     }
 
 
@@ -178,7 +204,7 @@ public class QuestionnaireManager : MonoBehaviour
             {
                 if (ques.answers[i].isCorrect)
                 {
-                    var a = answerTexts[i].transform.parent.GetChild(1);
+                    var a = options[i].transform.GetChild(1);
                     a.gameObject.SetActive(true);
                     a.GetComponent<Image>().color = Color.green;
                 }
@@ -195,7 +221,7 @@ public class QuestionnaireManager : MonoBehaviour
     void AnswerResponse(bool isCorrect, int index)
     {
         // give user response about his answer
-        var image = answerTexts[index].transform.parent.GetChild(1);
+        var image = options[index].transform.GetChild(1);
         image.gameObject.SetActive(true);
 
         if (isCorrect)
@@ -237,6 +263,42 @@ public class QuestionnaireManager : MonoBehaviour
     {
         GameSceneAnimations.instance.AllComponentsAnimations_OUT(0.2f,
             () => { GameSceneAnimations.instance.ResultScreenAnimations_IN(0.2f); });
+    }
+
+
+    public void HintButton_QS()
+    {
+        if (!hintTaken)
+        {
+            hintTaken = true;
+
+            // fade 2 wrong options
+            for (int i = 0; i < 2; i++)
+            {
+                while (usedHintNo.Contains(randomHintButton))
+                {
+                    randomHintButton = Random.Range(0, wrongAnswersListForHint.Count);
+                }
+
+                usedHintNo.Add(randomHintButton);
+                DisableHintButton(wrongAnswersListForHint[randomHintButton]);
+            }
+        }
+    }
+
+    void DisableHintButton(int buttonNo)
+    {
+        // options[buttonNo].alpha = 0.5f;
+        options[buttonNo].interactable = false;
+    }
+
+    void EnableAllButtons()
+    {
+        foreach (var op in options)
+        {
+            // op.alpha = 1;
+            op.interactable = true;
+        }
     }
 
 

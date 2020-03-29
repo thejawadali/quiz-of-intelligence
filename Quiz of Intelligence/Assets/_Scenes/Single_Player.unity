@@ -664,7 +664,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 155, y: 155}
+  m_SizeDelta: {x: 133, y: 133}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &320057411
 MonoBehaviour:
@@ -1815,7 +1815,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 155, y: 155}
+  m_SizeDelta: {x: 133, y: 133}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &611354270
 MonoBehaviour:
@@ -2082,7 +2082,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 589}
-  m_SizeDelta: {x: 155, y: 154.77771}
+  m_SizeDelta: {x: 133, y: 133}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &784854246
 GameObject:
@@ -2272,15 +2272,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   questionsCounter_GameScene: {fileID: 1969794820}
   questionText: {fileID: 1149111053}
-  answerTexts:
-  - {fileID: 1631665970}
-  - {fileID: 1470831912}
-  - {fileID: 509368507}
-  - {fileID: 1064223319}
+  options:
+  - {fileID: 1035320444}
+  - {fileID: 898809620}
+  - {fileID: 916013399}
+  - {fileID: 1623980009}
   timer_text: {fileID: 1140870783}
   timer_slider: {fileID: 611354270}
-  totalQuestions: 3
-  maxValue: 5
+  totalQuestions: 2
+  maxValue: 20
 --- !u!4 &796932461
 Transform:
   m_ObjectHideFlags: 0
@@ -4015,7 +4015,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1140870781}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -4025,7 +4025,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -26.000002, y: -26}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1140870783
 MonoBehaviour:
@@ -4045,7 +4045,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 20
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1e5f55dd07ed6445e8258e93a311b482, type: 2}
   m_sharedMaterial: {fileID: 5528949636485420143, guid: 1e5f55dd07ed6445e8258e93a311b482,
@@ -4115,13 +4115,13 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 1140870783}
-    characterCount: 2
+    characterCount: 0
     spriteCount: 0
     spaceCount: 0
-    wordCount: 1
+    wordCount: 0
     linkCount: 0
-    lineCount: 1
-    pageCount: 1
+    lineCount: 0
+    pageCount: 0
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
@@ -5109,7 +5109,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1427952768}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 796932460}
+        m_MethodName: HintButton_QS
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1427952768
 MonoBehaviour:
   m_ObjectHideFlags: 0
