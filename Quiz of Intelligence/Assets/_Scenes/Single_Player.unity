@@ -1887,8 +1887,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -91.16699, y: 0}
-  m_SizeDelta: {x: 17.313, y: 30.36}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 71.5, y: 30.36}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &651860185
 MonoBehaviour:
@@ -2271,7 +2271,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abc48e19f04e94e419a47a7d58af0def, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  total_coins_text: {fileID: 911520429}
+  cur_points_text: {fileID: 651860185}
+  hint_coin_text: {fileID: 977407061}
   questionsCounter_GameScene: {fileID: 1969794820}
   questionText: {fileID: 1149111053}
   options:
@@ -2281,8 +2282,9 @@ MonoBehaviour:
   - {fileID: 1623980009}
   timer_text: {fileID: 1140870783}
   timer_slider: {fileID: 611354270}
-  totalQuestions: 11
+  totalQuestions: 7
   maxValue: 20
+  minCoinsForHint: 20
 --- !u!4 &796932461
 Transform:
   m_ObjectHideFlags: 0
@@ -2337,10 +2339,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 836eb25104b794caab9bf6dde7ce27ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  points_text: {fileID: 1314807738}
+  cur_points_text: {fileID: 1314807738}
   cur_coins_count_text: {fileID: 565454540}
   wrongAnswersText: {fileID: 1943744634}
   correctAnswersText: {fileID: 295273853}
+  total_coins_text: {fileID: 911520429}
 --- !u!1 &806400827
 GameObject:
   m_ObjectHideFlags: 0
@@ -3409,7 +3412,7 @@ GameObject:
   - component: {fileID: 977407062}
   - component: {fileID: 977407061}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: hint_text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4813,8 +4816,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -43.06, y: 0}
-  m_SizeDelta: {x: 48.1, y: 30.36}
+  m_AnchoredPosition: {x: -75.69, y: 0}
+  m_SizeDelta: {x: 32.79, y: 30.36}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &1338233415
 MonoBehaviour:
@@ -5058,6 +5061,7 @@ GameObject:
   - component: {fileID: 1427952769}
   - component: {fileID: 1427952768}
   - component: {fileID: 1427952767}
+  - component: {fileID: 1427952770}
   m_Layer: 5
   m_Name: hintbutton
   m_TagString: Untagged
@@ -5175,6 +5179,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1427952765}
   m_CullTransparentMesh: 0
+--- !u!225 &1427952770
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1427952765}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1461490667
 GameObject:
   m_ObjectHideFlags: 0

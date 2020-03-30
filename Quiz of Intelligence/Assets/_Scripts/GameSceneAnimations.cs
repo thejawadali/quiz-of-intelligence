@@ -17,7 +17,7 @@ public class GameSceneAnimations : MonoBehaviour
     [SerializeField] private RectTransform[] answers;
     [SerializeField] private RectTransform avatar_container;
     [SerializeField] private RectTransform time_slider;
-    [SerializeField] private RectTransform hintBtn;
+    [SerializeField] public RectTransform hintBtn;
 
     #endregion
 

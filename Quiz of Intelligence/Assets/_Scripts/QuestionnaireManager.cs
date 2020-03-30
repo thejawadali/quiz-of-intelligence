@@ -12,14 +12,16 @@ using Random = UnityEngine.Random;
 
 public class QuestionnaireManager : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI total_coins_text;
+    [SerializeField] private TextMeshProUGUI cur_points_text;
 
     [Space(12)]
 
     #region Texts quiz screen
 
-    [Header("Questions and options texts")]
     [SerializeField]
+    private TextMeshProUGUI hint_coin_text;
+
+    [Header("Questions and options texts")] [SerializeField]
     private TextMeshProUGUI questionsCounter_GameScene;
 
 
@@ -48,12 +50,17 @@ public class QuestionnaireManager : MonoBehaviour
     [SerializeField] [Header("Max time to solve a questions")]
     private float maxValue = 5f;
 
+    [SerializeField] [Header("Min coins to take hint")]
+    private int minCoinsForHint = 5;
+
     private float minValue = 0f;
 
     // Create a property to handle the slider's value
     private float currentValue = 0f;
-    private int totalCoins;
     private int currentQuestion;
+    private int pointsOfOneQuestion;
+    public static int cur_points;
+
     private Questions questionObject;
     private Question ques;
     private string json;
@@ -94,8 +101,20 @@ public class QuestionnaireManager : MonoBehaviour
 
     void Start()
     {
-        totalCoins = PlayerPrefs.GetInt("Total_Coins");
-        total_coins_text.text = totalCoins.ToString();
+        hint_coin_text.text = minCoinsForHint.ToString();
+        if (ResultScreen.totalCoins >= minCoinsForHint)
+        {
+            // hint button is intractable
+            GameSceneAnimations.instance.hintBtn.GetComponent<CanvasGroup>().interactable = true;
+            GameSceneAnimations.instance.hintBtn.GetComponent<CanvasGroup>().alpha = 1;
+        }
+        else
+        {
+            // hint button is not intractable
+            GameSceneAnimations.instance.hintBtn.GetComponent<CanvasGroup>().interactable = false;
+            GameSceneAnimations.instance.hintBtn.GetComponent<CanvasGroup>().alpha = 0.5f;
+        }
+
         // set timer_text = maxValue 
         timer_text.text = maxValue.ToString("f0");
 
@@ -162,6 +181,7 @@ public class QuestionnaireManager : MonoBehaviour
     private void Reset()
     {
         hintTaken = false;
+        pointsOfOneQuestion = 0;
         CurrentValue = 0;
         wrongOptionsListForHint.Clear();
         usedHintNo.Clear();
@@ -209,12 +229,14 @@ public class QuestionnaireManager : MonoBehaviour
         if (isCorrect)
         {
             // correct answer
-            totalCoins++;
-            total_coins_text.text = totalCoins.ToString();
             ResultScreen.correctAnswers++;
             ResultScreen.cur_coins_count++;
-            PlayerPrefs.SetInt("Total_Coins", totalCoins);
-            PlayerPrefs.Save();
+
+
+            // points logic
+            pointsOfOneQuestion = (int) (maxValue - CurrentValue);
+            cur_points += pointsOfOneQuestion;
+            cur_points_text.text = cur_points.ToString();
         }
         else
         {
@@ -292,22 +314,37 @@ public class QuestionnaireManager : MonoBehaviour
     {
         if (!hintTaken && GameSceneAnimations.gameStarted)
         {
-            hintTaken = true;
-
-            // fade 2 wrong options
-            for (int i = 0; i < 2; i++)
+            if (ResultScreen.totalCoins >= minCoinsForHint)
             {
-                while (usedHintNo.Contains(randomHintButton))
+                // can take hint
+                hintTaken = true;
+
+                // fade 2 wrong options
+                for (int i = 0; i < 2; i++)
                 {
-                    randomHintButton = Random.Range(0, wrongOptionsListForHint.Count);
+                    while (usedHintNo.Contains(randomHintButton))
+                    {
+                        randomHintButton = Random.Range(0, wrongOptionsListForHint.Count);
+                    }
+
+                    usedHintNo.Add(randomHintButton);
+                    options[wrongOptionsListForHint[randomHintButton]].interactable = false;
                 }
 
-                usedHintNo.Add(randomHintButton);
-                options[wrongOptionsListForHint[randomHintButton]].interactable = false;
+                ResultScreen.totalCoins -= minCoinsForHint;
+                ResultScreen.instance.total_coins_text.text = ResultScreen.totalCoins.ToString();
+                PlayerPrefs.SetInt("Total_Coins", ResultScreen.totalCoins);
+                PlayerPrefs.Save();
+                if (ResultScreen.totalCoins < minCoinsForHint)
+                {
+                    GameSceneAnimations.instance.hintBtn.GetComponent<CanvasGroup>().interactable = false;
+                    GameSceneAnimations.instance.hintBtn.GetComponent<CanvasGroup>().alpha = 0.5f;
+                }
             }
         }
     }
 
+    // working on coins deduction for hint
 
     public void AnswerButtonListeners(int index)
     {
