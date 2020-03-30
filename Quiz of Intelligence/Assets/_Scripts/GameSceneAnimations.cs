@@ -146,18 +146,18 @@ public class GameSceneAnimations : MonoBehaviour
 
     #region GameOver Screen
 
-    public void ResultScreenAnimations_IN(float time)
+    public void ResultScreenAnimations_IN(float time, Action onComplete = null)
     {
         resultScreen.SetActive(true);
         quizScreen.SetActive(false);
-        
+
         coins_container.DOAnchorPosY(15, time);
         heading.DOAnchorPosY(-48f, time);
         heading.GetComponent<TextMeshProUGUI>().DOFade(1, time);
         statsWindow.DOScale(Vector3.one, time);
         statsWindow.GetComponent<CanvasGroup>().DOFade(1, time);
         playAgainButton.DOAnchorPosX(0, time);
-        homeButton.DOAnchorPosX(0, time);
+        homeButton.DOAnchorPosX(0, time).OnComplete(() => { onComplete(); });
     }
 
     public void ResultScreenAnimations_OUT(float time, Action onComplete)

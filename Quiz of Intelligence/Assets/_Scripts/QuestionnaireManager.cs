@@ -345,7 +345,7 @@ public class QuestionnaireManager : MonoBehaviour
         }
     }
 
-    void PingRect(RectTransform rect)
+    public void PingRect(RectTransform rect)
     {
         Sequence mySequence = DOTween.Sequence();
         mySequence.Append(rect.DOScale(new Vector2(0.9f, 0.9f), 0.1f))
