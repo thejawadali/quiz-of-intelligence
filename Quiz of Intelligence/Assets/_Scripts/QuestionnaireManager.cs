@@ -333,6 +333,7 @@ public class QuestionnaireManager : MonoBehaviour
 
                 ResultScreen.totalCoins -= minCoinsForHint;
                 ResultScreen.instance.total_coins_text.text = ResultScreen.totalCoins.ToString();
+                PingRect(ResultScreen.instance.total_coins_text.GetComponent<RectTransform>());
                 PlayerPrefs.SetInt("Total_Coins", ResultScreen.totalCoins);
                 PlayerPrefs.Save();
                 if (ResultScreen.totalCoins < minCoinsForHint)
@@ -342,6 +343,14 @@ public class QuestionnaireManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    void PingRect(RectTransform rect)
+    {
+        Sequence mySequence = DOTween.Sequence();
+        mySequence.Append(rect.DOScale(new Vector2(0.9f, 0.9f), 0.1f))
+            .Append(rect.DOScale(new Vector2(1.1f, 1.1f), 0.1f))
+            .Append(rect.DOScale(Vector3.one, 0.1f));
     }
 
     // working on coins deduction for hint
