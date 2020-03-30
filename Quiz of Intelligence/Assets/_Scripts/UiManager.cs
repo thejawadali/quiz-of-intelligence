@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UiManager : MonoBehaviour
 {
+    public TextMeshProUGUI total_coins_text;
+    public TextMeshProUGUI total_points_text;
+
     #region MainMenu Stuff
 
     [Header("Main menu stuff")] public Button startQuiz_Button;
@@ -35,6 +39,8 @@ public class UiManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        total_coins_text.text = PlayerPrefs.GetInt("Total_Coins").ToString();
+        total_points_text.text = PlayerPrefs.GetInt("Total_Points") + " pts";
         MainMenuButtonsListeners();
     }
 

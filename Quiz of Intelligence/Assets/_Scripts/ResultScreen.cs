@@ -12,7 +12,7 @@ public class ResultScreen : MonoBehaviour
     public static int cur_coins_count;
 
 
-    private int points;
+    private int totalPoints;
     public static int totalCoins;
 
     #region Result screen data
@@ -37,6 +37,7 @@ public class ResultScreen : MonoBehaviour
         }
 
         totalCoins = PlayerPrefs.GetInt("Total_Coins");
+        totalPoints = PlayerPrefs.GetInt("Total_Points");
         total_coins_text.text = totalCoins.ToString();
         wrongAnswers = 0;
         correctAnswers = 0;
@@ -52,9 +53,13 @@ public class ResultScreen : MonoBehaviour
         cur_points_text.text = QuestionnaireManager.cur_points.ToString();
 
         totalCoins += cur_coins_count;
+        totalPoints += QuestionnaireManager.cur_points;
+
         // TODO: increase total coins text incrementally with animation
+
         total_coins_text.text = totalCoins.ToString();
         PlayerPrefs.SetInt("Total_Coins", totalCoins);
+        PlayerPrefs.SetInt("Total_Points", totalPoints);
         PlayerPrefs.Save();
     }
 
