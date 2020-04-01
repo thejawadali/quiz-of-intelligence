@@ -29,6 +29,7 @@ public class ResultScreen : MonoBehaviour
 
     #endregion
 
+
     public static ResultScreen instance = null;
 
     private void Awake()
@@ -48,12 +49,22 @@ public class ResultScreen : MonoBehaviour
 
     public void GameOver()
     {
+        if (correctAnswers >= 3)
+        {
+            if (QuestionnaireManager.difficulty <= 3)
+            {
+                PlayerPrefs.SetInt("DIFFICULTY", 2); //QuestionnaireManager.difficulty++);
+                PlayerPrefs.Save();
+            }
+        }
+
         correctAnswersText.text = correctAnswers.ToString();
         wrongAnswersText.text = wrongAnswers.ToString();
         cur_coins_count_text.text = "+" + cur_coins_count;
         cur_points_text.text = QuestionnaireManager.cur_points.ToString();
         totalPoints += QuestionnaireManager.cur_points;
 
+        totalCoins += cur_coins_count;
 
         GameSceneAnimations.instance.ResultScreenAnimations_IN(0.2f, () =>
         {
@@ -61,11 +72,10 @@ public class ResultScreen : MonoBehaviour
             AnimateCoinsText(cur_coins_count, () =>
             {
                 // total_coins_text.text = totalCoins.ToString();
-                StartCoroutine(TextUpdater(totalCoins, totalCoins + cur_coins_count, total_coins_text));
+                StartCoroutine(TextUpdater(totalCoins - cur_coins_count, totalCoins, total_coins_text));
                 CoinsTextDefualtPos();
             });
         });
-        totalCoins += cur_coins_count;
         PlayerPrefs.SetInt("Total_Coins", totalCoins);
         PlayerPrefs.SetInt("Total_Points", totalPoints);
         PlayerPrefs.Save();
@@ -103,6 +113,7 @@ public class ResultScreen : MonoBehaviour
             text.text = lastCoins.ToString();
             yield return new WaitForSeconds(0.2f);
         }
+
         QuestionnaireManager.instance.PingRect(text.GetComponent<RectTransform>());
     }
 

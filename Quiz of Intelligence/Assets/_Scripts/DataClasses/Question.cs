@@ -11,7 +11,8 @@ public class Question
 {
   public string _id;
   public string question;
-  public Category category;
+
+  public string category;
   public int difficulty;
   public List<Answers> answers;
 }

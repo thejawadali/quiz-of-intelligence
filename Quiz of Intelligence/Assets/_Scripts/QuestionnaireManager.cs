@@ -12,7 +12,9 @@ using Random = UnityEngine.Random;
 
 public class QuestionnaireManager : MonoBehaviour
 {
+    List<string> alreadyAskedQuestion_id = new List<string>();
     [SerializeField] private TextMeshProUGUI cur_points_text;
+
 
     [Space(12)]
 
@@ -61,6 +63,8 @@ public class QuestionnaireManager : MonoBehaviour
     private int pointsOfOneQuestion;
     public static int cur_points;
 
+    public static int difficulty;
+
     private Questions questionObject;
     private Question ques;
     private string json;
@@ -101,6 +105,10 @@ public class QuestionnaireManager : MonoBehaviour
 
     void Start()
     {
+        // getting difficulty
+        difficulty = PlayerPrefs.GetInt("DIFFICULTY",1);
+
+        alreadyAskedQuestion_id.Clear();
         hint_coin_text.text = minCoinsForHint.ToString();
         if (ResultScreen.totalCoins >= minCoinsForHint)
         {
@@ -119,7 +127,7 @@ public class QuestionnaireManager : MonoBehaviour
         timer_text.text = maxValue.ToString("f0");
 
         // get json file
-        json = File.ReadAllText(Application.dataPath + "/output.json");
+        json = File.ReadAllText(Application.dataPath + "/DB/Questions.json");
         questionObject = JsonUtility.FromJson<Questions>(json);
         // get question when quiz starts
         GetQuestion();
@@ -140,15 +148,21 @@ public class QuestionnaireManager : MonoBehaviour
         }
     }
 
+    public Category cat = Category.GENERAL_KNOWLEDGE;
+    public int diff = 1;
+
     /// <summary>
     /// to get questions
     /// </summary>
     void GetQuestion()
     {
-        ques = questionObject.questions[currentQuestion];
+        ques = Questions(UiManager.category, difficulty);
+        // ques = Questions(cat, diff);
+
 
         // question's text
-        questionText.text = ques.question;
+        questionText.text = ques.question + " " + ques.difficulty + " " + ques.category;
+        // questionText.text = ques.question;
         // shuffle answers list
         ques.answers = ques.answers.Shuffle().ToList();
         // answers text
@@ -163,9 +177,42 @@ public class QuestionnaireManager : MonoBehaviour
                     wrongOptionsListForHint.Add(i);
                 }
             }
+
+            // its temp
+            if (ques.answers[i].isCorrect)
+            {
+                options[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text += "\t c";
+            }
         }
 
         questionsCounter_GameScene.text = (currentQuestion + 1) + "/" + totalQuestions;
+    }
+
+
+    Question Questions(Category cat, int difficulty)
+    {
+        Question newQuestion = new Question();
+        // getting question of certain category and difficulty level
+        var questions = questionObject.questions
+            .Where(ques => ques.category == cat.ToString() && ques.difficulty == difficulty).ToList();
+
+        // get question randomly from any category
+        if (cat == Category.ALL)
+        {
+            questions = questionObject.questions.Where(ques => ques.difficulty == difficulty).ToList();
+        }
+        
+
+        // getting random but unique questions from 'questions'
+        var remainingQuestions = questions.SkipWhile(cq => alreadyAskedQuestion_id
+            .Contains(cq._id)).ToList();
+        if (remainingQuestions.Count > 0)
+        {
+            newQuestion = remainingQuestions[Random.Range(0, remainingQuestions.Count)];
+            alreadyAskedQuestion_id.Add(newQuestion._id);
+        }
+
+        return newQuestion;
     }
 
     /// <summary>
