@@ -11,6 +11,8 @@ public class UiManager : MonoBehaviour
     public TextMeshProUGUI total_coins_text;
     public TextMeshProUGUI total_points_text;
 
+    private bool loginTemp = true;
+
     #region MainMenu Stuff
 
     [Header("Main menu stuff")] public Button startQuiz_Button;
@@ -60,7 +62,15 @@ public class UiManager : MonoBehaviour
         mulitPlayer_Button.onClick.AddListener(() =>
         {
             // TODO: check if user's logged in or not
-            AnimationsManager.instance.LoginScreenAnimations_IN(0.1f);
+            if (loginTemp)
+            {
+                // load multiplayer scene
+                SceneManager.LoadScene(2);
+            }
+            else
+            {
+                AnimationsManager.instance.LoginScreenAnimations_IN(0.1f);
+            }
         });
     }
 

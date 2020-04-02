@@ -10,6 +10,12 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
+[Serializable]
+public enum GameMode
+{
+    SINGLEPLAYER, 
+    MULTIPLAYER
+}
 public class QuestionnaireManager : MonoBehaviour
 {
     List<string> alreadyAskedQuestion_id = new List<string>();
@@ -88,7 +94,7 @@ public class QuestionnaireManager : MonoBehaviour
 
     #endregion
 
-
+    public static GameMode gameMode;
     private bool hintTaken = false;
 
     public static QuestionnaireManager instance = null;
@@ -101,12 +107,21 @@ public class QuestionnaireManager : MonoBehaviour
         {
             instance = this;
         }
+
+        if (SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            gameMode = GameMode.SINGLEPLAYER;
+        }
+        else if (SceneManager.GetActiveScene().buildIndex == 2)
+        {
+            gameMode = GameMode.MULTIPLAYER;
+        }
     }
 
     void Start()
     {
         // getting difficulty
-        difficulty = PlayerPrefs.GetInt("DIFFICULTY",1);
+        difficulty = PlayerPrefs.GetInt("DIFFICULTY", 1);
 
         alreadyAskedQuestion_id.Clear();
         hint_coin_text.text = minCoinsForHint.ToString();
@@ -201,7 +216,7 @@ public class QuestionnaireManager : MonoBehaviour
         {
             questions = questionObject.questions.Where(ques => ques.difficulty == difficulty).ToList();
         }
-        
+
 
         // getting random but unique questions from 'questions'
         var remainingQuestions = questions.SkipWhile(cq => alreadyAskedQuestion_id

@@ -2,6 +2,7 @@ using System;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameSceneAnimations : MonoBehaviour
@@ -16,6 +17,7 @@ public class GameSceneAnimations : MonoBehaviour
 
     [SerializeField] private RectTransform[] answers;
     [SerializeField] private RectTransform avatar_container;
+    [SerializeField] private RectTransform avatar_container_other;
     [SerializeField] private RectTransform time_slider;
     [SerializeField] public RectTransform hintBtn;
 
@@ -43,6 +45,7 @@ public class GameSceneAnimations : MonoBehaviour
 
     public static bool gameStarted;
 
+
     public static GameSceneAnimations instance = null;
 
     private void Awake()
@@ -59,7 +62,10 @@ public class GameSceneAnimations : MonoBehaviour
         resultScreen.SetActive(false);
         // first get all components to their initial position
         AllComponentsAnimations_OUT(0);
-        AllComponentsAnimations_IN(0.2f);
+        if (QuestionnaireManager.gameMode == GameMode.SINGLEPLAYER)
+        {
+            AllComponentsAnimations_IN(0.2f);
+        }
     }
 
     #region In game question text and options animations
@@ -107,8 +113,9 @@ public class GameSceneAnimations : MonoBehaviour
     /// call it when quiz starts
     /// </summary>
     /// <param name="time"></param>
-    void AllComponentsAnimations_IN(float time)
+    public void AllComponentsAnimations_IN(float time)
     {
+        quizScreen.SetActive(true);
         avatar_container.DOAnchorPosX(33, time);
         time_slider.DOScale(Vector3.one, time);
         hintBtn.DOAnchorPosX(-199.36f, time);
@@ -118,6 +125,10 @@ public class GameSceneAnimations : MonoBehaviour
             // animate questions in
             AnimateQuestions_IN(0.2f);
         });
+        if (QuestionnaireManager.gameMode == GameMode.MULTIPLAYER)
+        {
+            avatar_container_other.DOAnchorPosX(-33, time);
+        }
     }
 
     /// <summary>
@@ -139,6 +150,10 @@ public class GameSceneAnimations : MonoBehaviour
             coins_container.DOAnchorPosY(-50, time);
             hintBtn.DOAnchorPosX(-540, time)
                 .OnComplete(() => { onComplete(); });
+            if (QuestionnaireManager.gameMode == GameMode.MULTIPLAYER)
+            {
+                avatar_container_other.DOAnchorPosX(180f, time);
+            }
         });
     }
 
