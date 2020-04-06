@@ -51,3 +51,5 @@ Assets/Plugins/Android/*
 !Assets/Plugins/Android/mainTemplate.gradle.meta
 /Assets/Questionaires.json
 /Assets/Questionaires.json.meta
+/Quiz of Intelligence/Assets/Firebase
+/Quiz of Intelligence/Assets/FacebookSDK

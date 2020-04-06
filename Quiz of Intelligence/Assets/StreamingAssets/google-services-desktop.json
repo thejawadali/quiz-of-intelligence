@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "351161928357",
+    "firebase_url": "https://fir-and-unity-testing.firebaseio.com",
+    "project_id": "fir-and-unity-testing",
+    "storage_bucket": "fir-and-unity-testing.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:351161928357:android:2c332f7cdc01d31f715b4c",
+        "android_client_info": {
+          "package_name": "com.ali.authdemo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "351161928357-jkeuug94utkp0h0oqr4ir1nqes40v0as.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATZyIB6R0rc7OmsTwK0GNsKgXKrMcn9DY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "351161928357-jkeuug94utkp0h0oqr4ir1nqes40v0as.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:351161928357:android:4fe0b1c64d67087e715b4c",
+        "android_client_info": {
+          "package_name": "com.vu.quizofintelligence"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "351161928357-jkeuug94utkp0h0oqr4ir1nqes40v0as.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATZyIB6R0rc7OmsTwK0GNsKgXKrMcn9DY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "351161928357-jkeuug94utkp0h0oqr4ir1nqes40v0as.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
