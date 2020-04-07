@@ -2,72 +2,66 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Facebook.Unity;
 using UnityEngine;
 
 public class AnimationsManager : MonoBehaviour
 {
-  public CanvasGroup mainMenu;
-  public CanvasGroup categoryWindow;
-  public CanvasGroup loginWindow;
+    public CanvasGroup mainMenu;
+    public CanvasGroup categoryWindow;
+    public GameObject loginWindow;
+    public GameObject logoutBtn;
 
-  public static AnimationsManager instance = null;
+    public static AnimationsManager instance = null;
 
-  private void Awake()
-  {
-    if (instance == null)
+    private void Awake()
     {
-      instance = this;
+        if (instance == null)
+        {
+            instance = this;
+        }
     }
-  }
 
-  void Start()
-  {
-    mainMenu.interactable = true;
-  }
+    void Start()
+    {
+        loginWindow.SetActive(false);
 
-  
-  #region Category Menu Animations
 
-  public void CategoryWindowAnimation_IN(float time)
-  {
-    // categoryWindow.interactable = true;
-    categoryWindow.GetComponent<RectTransform>().DOAnchorPosX(0, time);
-    categoryWindow.DOFade(1, time);
-  }
+        // if user's not logged in show him log in screen else go to main menu
+        // if (FB.IsLoggedIn)
+        // {
+        //     Debug.Log("user is logged in");
+        //     // go to main menu
+        //     mainMenu.interactable = true;
+        //     logoutBtn.SetActive(true);
+        // }
+        // else
+        // {
+        //     Debug.Log("user is not logged in");
+        //     loginWindow.SetActive(true);
+        //     logoutBtn.SetActive(false);
+        // }
+    }
 
-  public void CategoryWindowAnimation_Out(float time)
-  {
 
-    categoryWindow.GetComponent<RectTransform>().DOAnchorPosX(800, time);
-    categoryWindow.DOFade(0, time);
-    //   .OnComplete(() =>
-    // {
-    //   MainMenuAnimation_IN(time);
-    // });
-  }
+    #region Category Menu Animations
 
-  #endregion
+    public void CategoryWindowAnimation_IN(float time)
+    {
+        // categoryWindow.interactable = true;
+        categoryWindow.GetComponent<RectTransform>().DOAnchorPosX(0, time);
+        categoryWindow.DOFade(1, time);
+    }
 
-  #region Login screen animations
+    public void CategoryWindowAnimation_Out(float time)
+    {
+        categoryWindow.GetComponent<RectTransform>().DOAnchorPosX(800, time);
+        categoryWindow.DOFade(0, time);
+        //   .OnComplete(() =>
+        // {
+        //   MainMenuAnimation_IN(time);
+        // });
+    }
 
-  public void LoginScreenAnimations_IN(float time)
-  {
-    loginWindow.GetComponent<RectTransform>().DOAnchorPosX(0, time);
-    loginWindow.DOFade(1, time);
-    //   .OnComplete(() =>
-    // {
-    // }); 
-  }
-
-  public void LoginScreenAnimations_OUT(float time)
-  {
-    loginWindow.GetComponent<RectTransform>().DOAnchorPosX(800, time);
-    loginWindow.DOFade(0, time);
-    //   .OnComplete(() =>
-    // {
-    // });
-  }
-
-  #endregion
-  
+    #endregion
 }

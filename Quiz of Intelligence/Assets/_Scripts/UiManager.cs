@@ -11,14 +11,6 @@ public class UiManager : MonoBehaviour
     public TextMeshProUGUI total_coins_text;
     public TextMeshProUGUI total_points_text;
 
-    private bool loginTemp = true;
-
-    #region MainMenu Stuff
-
-    [Header("Main menu stuff")] public Button startQuiz_Button;
-    public Button mulitPlayer_Button;
-
-    #endregion
 
     #region Category Stuff
 
@@ -37,44 +29,13 @@ public class UiManager : MonoBehaviour
             instance = this;
         }
     }
-
-    // Start is called before the first frame update
+    
     void Start()
     {
         total_coins_text.text = PlayerPrefs.GetInt("Total_Coins").ToString();
         total_points_text.text = PlayerPrefs.GetInt("Total_Points") + " pts";
-        MainMenuButtonsListeners();
     }
 
-    #region MainMenu Methods
-
-    private void MainMenuButtonsListeners()
-    {
-        // start button clicked, show category selection window
-        startQuiz_Button.onClick.AddListener(() =>
-        {
-            // make main menu items non-interactable and animate category selection window in 
-            AnimationsManager.instance.mainMenu.interactable = false;
-            AnimationsManager.instance.CategoryWindowAnimation_IN(0.1f);
-        });
-
-        // multi-player button clicked, if user logged in show create room screen else login screen
-        mulitPlayer_Button.onClick.AddListener(() =>
-        {
-            // TODO: check if user's logged in or not
-            if (loginTemp)
-            {
-                // load multiplayer scene
-                SceneManager.LoadScene(2);
-            }
-            else
-            {
-                AnimationsManager.instance.LoginScreenAnimations_IN(0.1f);
-            }
-        });
-    }
-
-    #endregion
 
     #region Category Selection methods
 
@@ -120,19 +81,32 @@ public class UiManager : MonoBehaviour
     #endregion
 
 
-    public void BackToMenu(bool isLoginScreen)
-    {
-        // make main menu interactable
-        AnimationsManager.instance.mainMenu.interactable = true;
+    #region GameScene button listeners
 
-        // if login screen animate login screen out else category screen
-        if (isLoginScreen)
-        {
-            AnimationsManager.instance.LoginScreenAnimations_OUT(0.1f);
-        }
-        else
-        {
-            AnimationsManager.instance.CategoryWindowAnimation_Out(0.1f);
-        }
+    public void PlayButton_SinglePlayer()
+    {
+        // make main menu items non-intractable and animate category selection window in 
+        AnimationsManager.instance.mainMenu.interactable = false;
+        AnimationsManager.instance.CategoryWindowAnimation_IN(0.1f);
+    }
+
+    public void PlayButton_Multiplayer()
+    {
+        Debug.Log("Lets challenge friend");
+        // check if user is logged in, show him online users screen to invite a friend
+    }
+
+    #endregion
+
+    public void BackToMenu()
+    {
+        // make main menu intractable
+        AnimationsManager.instance.mainMenu.interactable = true;
+        AnimationsManager.instance.CategoryWindowAnimation_Out(0.1f);
+    }
+
+    public void QuitApplication()
+    {
+        Application.Quit();
     }
 }
