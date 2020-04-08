@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using DG.Tweening;
+using Firebase;
+using Firebase.Auth;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,9 +15,10 @@ using Random = UnityEngine.Random;
 [Serializable]
 public enum GameMode
 {
-    SINGLEPLAYER, 
+    SINGLEPLAYER,
     MULTIPLAYER
 }
+
 public class QuestionnaireManager : MonoBehaviour
 {
     List<string> alreadyAskedQuestion_id = new List<string>();
@@ -41,6 +44,7 @@ public class QuestionnaireManager : MonoBehaviour
     private TextMeshProUGUI timer_text;
 
     [SerializeField] private Image timer_slider;
+    [SerializeField] private TextMeshProUGUI playerName_text;
 
     #endregion
 
@@ -94,6 +98,9 @@ public class QuestionnaireManager : MonoBehaviour
 
     #endregion
 
+    private FirebaseAuth auth;
+    private FirebaseUser user;
+
     public static GameMode gameMode;
     private bool hintTaken = false;
 
@@ -116,12 +123,32 @@ public class QuestionnaireManager : MonoBehaviour
         {
             gameMode = GameMode.MULTIPLAYER;
         }
+
+        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
+        {
+            var dependencyStatus = task.Result;
+            if (dependencyStatus == DependencyStatus.Available)
+            {
+                auth = FirebaseAuth.DefaultInstance;
+                user = auth.CurrentUser;
+            }
+        });
     }
 
     void Start()
     {
         // getting difficulty
         difficulty = PlayerPrefs.GetInt("DIFFICULTY", 1);
+
+        // setting user name in game scene
+        if (user != null)
+        {
+            playerName_text.text = user.DisplayName;//` + "\n UID: " + user.UserId;
+        }
+        else
+        {
+            playerName_text.text = "You";
+        }
 
         alreadyAskedQuestion_id.Clear();
         hint_coin_text.text = minCoinsForHint.ToString();

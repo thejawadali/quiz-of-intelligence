@@ -14,40 +14,45 @@ public class FacebookAuthenticator : MonoBehaviour
     private FirebaseAuth auth;
     private FirebaseUser user;
 
+    public static FacebookAuthenticator instance = null;
 
     private void Awake()
     {
-#if !UNITY_EDITOR
-        Initialize();
-#endif
-    }
-
-    /// <summary>
-    /// To initialize fb and firebase
-    /// </summary>
-    async void Initialize()
-    {
-        // initialize firebase
-        var result = await FirebaseApp.CheckAndFixDependenciesAsync();
-        if (result == DependencyStatus.Available)
+        if (instance == null)
         {
-            auth = FirebaseAuth.DefaultInstance;
-            user = auth.CurrentUser;
-            // if facebook sdk in not initialized, initialize it
-            if (!FB.IsInitialized)
+            instance = this;
+        }
+
+        
+#if !UNITY_EDITOR
+        // initialize firebase and facebook sdk
+        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
+        {
+            var dependencyStatus = task.Result;
+            if (dependencyStatus == DependencyStatus.Available)
             {
-                FB.Init(InitCallback, OnHideUnity);
+                auth = FirebaseAuth.DefaultInstance;
+                user = auth.CurrentUser;
+                // if facebook sdk in not initialized, initialize it
+
+                if (!FB.IsInitialized)
+                {
+                    FB.Init(InitCallback, OnHideUnity);
+                }
+                else
+                {
+                    FB.ActivateApp();
+                }
             }
             else
             {
-                FB.ActivateApp();
+                Debug.LogError("Could not resolve all Firebase dependencies " + task);
             }
-        }
-        else
-        {
-            Debug.LogError("Could not resolve all Firebase dependencies " + result);
-        }
+        });
+#endif
     }
+
+  
 
 
     void InitCallback()
@@ -57,7 +62,6 @@ public class FacebookAuthenticator : MonoBehaviour
             FB.ActivateApp();
             if (FB.IsLoggedIn)
             {
-                // userCreds();
                 // user is logged in
                 // go to main menu
                 AnimationsManager.instance.mainMenu.interactable = true;
@@ -82,41 +86,6 @@ public class FacebookAuthenticator : MonoBehaviour
             Time.timeScale = 0;
         else
             Time.timeScale = 1;
-    }
-
-    private void Start()
-    {
-    }
-
-
-    void userCreds()
-    {
-        if (user != null)
-        {
-            string name = user.DisplayName;
-            string email = user.Email;
-            Uri photo_url = user.PhotoUrl;
-            // The user's Id, unique to the Firebase project.
-            // Do NOT use this value to authenticate with your backend server, if you
-            // have one; use User.TokenAsync() instead.
-            string uid = user.UserId;
-
-            // text.text = "Name: " + name + "\n email: " + email + "\n uid: " + uid;
-            // StartCoroutine(LoadImageFromURL(photo_url.ToString(), (texture) =>
-            // {
-            //     image.sprite = Sprite.Create(texture as Texture2D, new Rect(0, 0, texture.width, texture.height),
-            //         new Vector2(0, 0));
-            // }));
-        }
-    }
-
-
-    public static IEnumerator LoadImageFromURL(string url, Action<Texture> sendBackResponse)
-    {
-        var webRequest = UnityWebRequestTexture.GetTexture(url);
-        yield return webRequest.SendWebRequest(); // start loading whatever in that url ( delay happens here )
-        Texture myTexture = DownloadHandlerTexture.GetContent(webRequest);
-        sendBackResponse(myTexture);
     }
 
 
@@ -168,7 +137,6 @@ public class FacebookAuthenticator : MonoBehaviour
     }
 
 
-    
     // TODO: delete this functionality in future
     public void FB_Logout()
     {
