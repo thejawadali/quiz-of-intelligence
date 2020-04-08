@@ -169,7 +169,8 @@ public class QuestionnaireManager : MonoBehaviour
         timer_text.text = maxValue.ToString("f0");
 
         // get json file
-        json = File.ReadAllText(Application.dataPath + "/DB/Questions.json");
+        var path = Path.Combine(Application.persistentDataPath, "Questions.json"); 
+        json = File.ReadAllText(path);
         questionObject = JsonUtility.FromJson<Questions>(json);
         // get question when quiz starts
         GetQuestion();

@@ -10,6 +10,7 @@
             <e p="Category.cs" t="Include" />
             <e p="Question.cs" t="Include" />
           </e>
+          <e p="DBGenerator.cs" t="Include" />
           <e p="EnumerableExtensions.cs" t="Include" />
           <e p="FacebookAuthenticator.cs" t="Include" />
           <e p="GameSceneAnimations.cs" t="Include" />

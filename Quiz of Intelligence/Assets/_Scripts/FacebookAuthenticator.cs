@@ -14,14 +14,14 @@ public class FacebookAuthenticator : MonoBehaviour
     private FirebaseAuth auth;
     private FirebaseUser user;
 
-    public static FacebookAuthenticator instance = null;
+    // public static FacebookAuthenticator instance = null;
 
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
+        // if (instance == null)
+        // {
+        //     instance = this;
+        // }
 
         
 #if !UNITY_EDITOR
