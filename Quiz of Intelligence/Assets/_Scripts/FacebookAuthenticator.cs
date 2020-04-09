@@ -12,19 +12,22 @@ using UnityEngine.UI;
 public class FacebookAuthenticator : MonoBehaviour
 {
     private FirebaseAuth auth;
-    private FirebaseUser user;
 
-    // public static FacebookAuthenticator instance = null;
+
+    public static FacebookAuthenticator instance = null;
 
     private void Awake()
     {
-        // if (instance == null)
-        // {
-        //     instance = this;
-        // }
+        if (instance == null)
+        {
+            instance = this;
+        }
+    }
 
-        
-#if !UNITY_EDITOR
+    #region Initialize fireabase and facebook
+
+    public void InitializeFirebase()
+    {
         // initialize firebase and facebook sdk
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
@@ -32,7 +35,7 @@ public class FacebookAuthenticator : MonoBehaviour
             if (dependencyStatus == DependencyStatus.Available)
             {
                 auth = FirebaseAuth.DefaultInstance;
-                user = auth.CurrentUser;
+
                 // if facebook sdk in not initialized, initialize it
 
                 if (!FB.IsInitialized)
@@ -49,10 +52,7 @@ public class FacebookAuthenticator : MonoBehaviour
                 Debug.LogError("Could not resolve all Firebase dependencies " + task);
             }
         });
-#endif
     }
-
-  
 
 
     void InitCallback()
@@ -88,10 +88,14 @@ public class FacebookAuthenticator : MonoBehaviour
             Time.timeScale = 1;
     }
 
+    #endregion
+
+
+    #region Login
 
     public void FB_Login()
     {
-        var permissions = new List<string>() {"public_profile", "email"};
+        var permissions = new List<string>() {"public_profile"};
         FB.LogInWithReadPermissions(permissions, result =>
         {
             if (FB.IsLoggedIn)
@@ -136,6 +140,7 @@ public class FacebookAuthenticator : MonoBehaviour
         });
     }
 
+    #endregion
 
     // TODO: delete this functionality in future
     public void FB_Logout()

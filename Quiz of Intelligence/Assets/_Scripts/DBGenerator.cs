@@ -17,7 +17,6 @@ public class DBGenerator : MonoBehaviour
         {
             // db exists, continue
             DB_Exists();
-
         }
         else
         {
@@ -25,6 +24,9 @@ public class DBGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// To create questions DB
+    /// </summary>
     void GenerateDB()
     {
         progressGroup.SetActive(true);
@@ -42,7 +44,6 @@ public class DBGenerator : MonoBehaviour
                             Application.persistentDataPath + Path.DirectorySeparatorChar + "Questions.json",
                             response);
                         DB_Exists();
-                        
                     }
                     catch (Exception e)
                     {
@@ -60,17 +61,23 @@ public class DBGenerator : MonoBehaviour
     }
 
 
+    
+    /// <summary>
+    /// DB has already created
+    /// </summary>
     void DB_Exists()
     {
         progressGroup.SetActive(false);
+#if !UNITY_EDITOR
+      FacebookAuthenticator.instance.InitializeFirebase();
+#endif
     }
-    
+
 
     IEnumerator ProgressCoroutine(UnityWebRequest req)
     {
         while (isDownloading)
         {
-            // Debug.Log("Downloading : " + req.downloadProgress);//* 100 + "%");
             progressBar.fillAmount = req.downloadProgress;
             yield return new WaitForSeconds(0.1f);
         }

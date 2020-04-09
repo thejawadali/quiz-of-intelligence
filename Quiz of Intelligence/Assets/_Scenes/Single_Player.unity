@@ -2352,7 +2352,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 836eb25104b794caab9bf6dde7ce27ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cur_points_text: {fileID: 1314807738}
+  totalPointsText_RS: {fileID: 1314807738}
   outlined_coinText_forAnimation: {fileID: 356715355}
   cur_coins_count_text: {fileID: 565454540}
   wrongAnswersText: {fileID: 1943744634}
