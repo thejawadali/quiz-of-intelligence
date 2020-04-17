@@ -16,7 +16,6 @@ public class UserUtils : MonoBehaviour
   public static string UID;
   public static string userName;
   private int totalPoints;
-  public static bool userIsFree = true;
   // private DateTime lastPingTime;
 
 
@@ -44,29 +43,44 @@ public class UserUtils : MonoBehaviour
         reference = FirebaseDatabase.DefaultInstance.RootReference;
         reference.Child("Users").Child(user.UserId).Child("userName").SetValueAsync(user.DisplayName);
         UID = user.UserId;
-        StartCoroutine(UserPing(reference));
+        UserStatus(true);
         FirebaseDatabase.DefaultInstance.GetReference("Users").ValueChanged += HandleValueChanged;
       }
     });
   }
 
 
-  private void Start()
-  {
 
+  /// <summary>
+  /// Check user's status, whether if he is online or offline
+  /// </summary>
+  /// <param name="isOnline"></param>
+  public void UserStatus(bool isOnline)
+  {
+    reference.Child("Users").Child(UID).Child("availableForChallenge").SetValueAsync(isOnline);
   }
 
-  IEnumerator UserPing(DatabaseReference _reference)
+  private void OnApplicationFocus(bool focusStatus)
   {
-    if (userIsFree)
-      while (true)
-      {
-        yield return new WaitForSeconds(5);
-        var time = DateTime.Now.ToString("yyyy/mm/dd hh:mm:ss");
-        _reference.Child("Users").Child(UID).Child("lastPing").SetValueAsync(time);
-      }
-
+    UserStatus(focusStatus);
   }
+
+  private void OnApplicationQuit()
+  {
+    UserStatus(false);
+  }
+
+  // IEnumerator UserPing(DatabaseReference _reference)
+  // {
+  //   if (userIsFree)
+  //     while (true)
+  //     {
+  //       yield return new WaitForSeconds(5);
+  //       var time = DateTime.Now.ToString("yyyy/mm/dd hh:mm:ss");
+  //       _reference.Child("Users").Child(UID).Child("lastPing").SetValueAsync(time);
+  //     }
+
+  // }
 
 
   public void SetPoints(int totalPoints)

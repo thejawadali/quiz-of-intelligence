@@ -55,6 +55,7 @@ public class ResultScreen : MonoBehaviour
 
   public void GameOver()
   {
+    UserUtils.instance.UserStatus(true);
     if (correctAnswers >= 3)
     {
       if (QuestionnaireManager.difficulty <= 3)
