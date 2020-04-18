@@ -9,7 +9,6 @@ using UnityEngine.UI;
 public class UiManager : MonoBehaviour
 {
   public TextMeshProUGUI total_coins_text;
-  public TextMeshProUGUI total_points_text;
 
 
   #region Category Stuff
@@ -33,7 +32,6 @@ public class UiManager : MonoBehaviour
   void Start()
   {
     total_coins_text.text = PlayerPrefs.GetInt("Total_Coins").ToString();
-    total_points_text.text = PlayerPrefs.GetInt("Total_Points") + " pts";
   }
 
 
@@ -93,8 +91,7 @@ public class UiManager : MonoBehaviour
 
   public void PlayButton_Multiplayer()
   {
-    Debug.Log("Lets challenge friend");
-    // check if user is logged in, show him online users screen to invite a friend
+    SceneManager.LoadScene(2);
   }
 
   #endregion
