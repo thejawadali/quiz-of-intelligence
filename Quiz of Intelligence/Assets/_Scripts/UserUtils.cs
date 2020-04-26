@@ -71,11 +71,12 @@ public class UserUtils : MonoBehaviour
   }
 
 
-  public void SetPoints(int totalPoints)
+  public void UpdateUserProgress(int totalPoints, string timeTaken)
   {
     if (user != null)
     {
       reference.Child("Users").Child(UID).Child("totalPoints").SetValueAsync(totalPoints);
+      reference.Child("Users").Child(UID).Child("timeTaken").SetValueAsync(timeTaken);
     }
   }
 

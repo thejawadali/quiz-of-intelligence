@@ -54,7 +54,7 @@ public class ResultScreen : MonoBehaviour
         PlayerPrefs.Save();
 
         // save total points on firebase
-        UserUtils.instance.SetPoints(QuestionnaireManager.totalPoints);
+        UserUtils.instance.UpdateUserProgress(QuestionnaireManager.totalPoints, QuestionnaireManager.timeTakenToSolveQuiz.ToString("0.00"));
 
         UserUtils.instance.UserStatus(true);
     }
