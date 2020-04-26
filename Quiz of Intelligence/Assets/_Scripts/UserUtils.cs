@@ -70,18 +70,6 @@ public class UserUtils : MonoBehaviour
     UserStatus(false);
   }
 
-  // IEnumerator UserPing(DatabaseReference _reference)
-  // {
-  //   if (userIsFree)
-  //     while (true)
-  //     {
-  //       yield return new WaitForSeconds(5);
-  //       var time = DateTime.Now.ToString("yyyy/mm/dd hh:mm:ss");
-  //       _reference.Child("Users").Child(UID).Child("lastPing").SetValueAsync(time);
-  //     }
-
-  // }
-
 
   public void SetPoints(int totalPoints)
   {

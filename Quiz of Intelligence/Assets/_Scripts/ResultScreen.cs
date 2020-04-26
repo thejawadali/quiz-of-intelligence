@@ -12,129 +12,77 @@ using UnityEngine.SceneManagement;
 
 public class ResultScreen : MonoBehaviour
 {
-  public static int wrongAnswers;
-  public static int correctAnswers;
-  public static int cur_coins_count;
+    public static int wrongAnswers;
+    public static int correctAnswers;
 
 
-  public static int totalCoins;
+    #region Result screen data
 
+    [Header("Result screen data")] [SerializeField]
+    private TextMeshProUGUI totalPointsText;
 
+    [SerializeField] private TextMeshProUGUI timeTakenToSolveQuiz_text;
+    [SerializeField] private TextMeshProUGUI wrongAnswersText;
+    [SerializeField] private TextMeshProUGUI correctAnswersText;
 
-  #region Result screen data
+    #endregion
 
-  [Header("Result screen data")]
-  [SerializeField]
-  private TextMeshProUGUI totalPointsText_RS;
+    public static ResultScreen instance = null;
 
-  [SerializeField] public TextMeshProUGUI outlined_coinText_forAnimation;
-  [SerializeField] private TextMeshProUGUI cur_coins_count_text;
-  [SerializeField] private TextMeshProUGUI wrongAnswersText;
-  [SerializeField] private TextMeshProUGUI correctAnswersText;
-  [SerializeField] public TextMeshProUGUI total_coins_text;
-
-  #endregion
-
-
-  public static ResultScreen instance = null;
-
-  private void Awake()
-  {
-    if (instance == null)
+    private void Awake()
     {
-      instance = this;
+        if (instance == null)
+        {
+            instance = this;
+        }
+
+        wrongAnswers = 0;
+        correctAnswers = 0;
     }
 
-
-    totalCoins = PlayerPrefs.GetInt("Total_Coins");
-    total_coins_text.text = totalCoins.ToString();
-    wrongAnswers = 0;
-    correctAnswers = 0;
-    cur_coins_count = 0;
-  }
-
-  public void GameOver()
-  {
-    UserUtils.instance.UserStatus(true);
-    if (correctAnswers >= 3)
+    public void GameOver()
     {
-      if (QuestionnaireManager.difficulty <= 3)
-      {
-        PlayerPrefs.SetInt("DIFFICULTY", QuestionnaireManager.difficulty++);
+        IncrementDifficulty();
+
+        timeTakenToSolveQuiz_text.text = QuestionnaireManager.timeTakenToSolveQuiz.ToString("0.00") + " secs";
+        correctAnswersText.text = correctAnswers.ToString();
+        wrongAnswersText.text = wrongAnswers.ToString();
+        totalPointsText.text = QuestionnaireManager.totalPoints.ToString();
+
+
+        GameSceneAnimations.instance.ResultScreenAnimations_IN(0.2f);
         PlayerPrefs.Save();
-      }
+
+        // save total points on firebase
+        UserUtils.instance.SetPoints(QuestionnaireManager.totalPoints);
+
+        UserUtils.instance.UserStatus(true);
     }
 
-    correctAnswersText.text = correctAnswers.ToString();
-    wrongAnswersText.text = wrongAnswers.ToString();
-    cur_coins_count_text.text = "+" + cur_coins_count;
-    totalPointsText_RS.text = QuestionnaireManager.totalPoints.ToString();
-
-    totalCoins += cur_coins_count;
-
-    GameSceneAnimations.instance.ResultScreenAnimations_IN(0.2f, () =>
+    void IncrementDifficulty()
     {
-      //  increase total coins text incrementally with animation
-      AnimateCoinsText(cur_coins_count, () =>
-      {
-        // total_coins_text.text = totalCoins.ToString();
-        StartCoroutine(TextUpdater(totalCoins - cur_coins_count, totalCoins, total_coins_text));
-        CoinsTextDefualtPos();
-      });
-    });
-
-    // save total points on firebase
-    UserUtils.instance.SetPoints(QuestionnaireManager.totalPoints);
-
-    // storing total coins in player prefs
-    PlayerPrefs.SetInt("Total_Coins", totalCoins);
-    PlayerPrefs.Save();
-  }
-
-  void AnimateCoinsText(int coinsCount, Action onComplete = null)
-  {
-    float time = 0.3f;
-    outlined_coinText_forAnimation.text = "+" + coinsCount;
-    outlined_coinText_forAnimation.gameObject.SetActive(true);
-    var rect = outlined_coinText_forAnimation.GetComponent<RectTransform>();
-    rect.DOScale(new Vector2(2, 2), time * 2).OnComplete(() =>
-    {
-      rect.DOScale(Vector3.zero, time);
-      rect.DOAnchorPos(new Vector2(-280, -770), time);
-      outlined_coinText_forAnimation.DOFade(0.5f, time * 1.5f).OnComplete(() => { onComplete(); });
-    });
-  }
-
-  void CoinsTextDefualtPos()
-  {
-    outlined_coinText_forAnimation.gameObject.SetActive(false);
-    outlined_coinText_forAnimation.text = "";
-    outlined_coinText_forAnimation.GetComponent<RectTransform>().DOScale(Vector3.one, 0);
-    outlined_coinText_forAnimation.GetComponent<RectTransform>().DOAnchorPos(new Vector2(-75f, 0), 0);
-    outlined_coinText_forAnimation.DOFade(1, 0);
-  }
-
-
-  IEnumerator TextUpdater(int lastCoins, int newCoins, TextMeshProUGUI text)
-  {
-    while (lastCoins < newCoins)
-    {
-      lastCoins++;
-      text.text = lastCoins.ToString();
-      yield return new WaitForSeconds(0.2f);
+        // check if all answers are correct and user solve quiz with in required time
+        var requiredTime = (float) (QuestionnaireManager.totalQuestions * 20) / 2;
+        if (correctAnswers >= QuestionnaireManager.totalQuestions &&
+            QuestionnaireManager.timeTakenToSolveQuiz <= requiredTime)
+        {
+            if (QuestionnaireManager.difficulty < 3)
+            {
+                QuestionnaireManager.difficulty++;
+                PlayerPrefs.SetInt("DIFFICULTY", QuestionnaireManager.difficulty);
+                PlayerPrefs.Save();
+            }
+        }
     }
 
-    QuestionnaireManager.instance.PingRect(text.GetComponent<RectTransform>());
-  }
 
+    public void PlayAgainButton()
+    {
+        GameSceneAnimations.instance.ResultScreenAnimations_OUT(0.2f, () => { SceneManager.LoadScene(1); });
+    }
 
-  public void PlayAgainButton()
-  {
-    GameSceneAnimations.instance.ResultScreenAnimations_OUT(0.2f, () => { SceneManager.LoadScene(1); });
-  }
-
-  public void HomeButton()
-  {
-    GameSceneAnimations.instance.ResultScreenAnimations_OUT(0.2f, () => { SceneManager.LoadScene(0); });
-  }
+    public void HomeButton()
+    {
+        GameSceneAnimations.instance.ResultScreenAnimations_OUT(0.2f, () => { SceneManager.LoadScene(0); });
+    }
 }
