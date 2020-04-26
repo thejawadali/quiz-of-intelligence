@@ -306,11 +306,15 @@ public class QuestionnaireManager : MonoBehaviour
         {
             // correct answer
             ResultScreen.correctAnswers++;
+            // reward coins only if user did not take hint
+            if (!hintTaken)
+            {
+                totalCoins += CoinsReward(CurrentValue);
+                StartCoroutine(TextUpdater(totalCoins - CoinsReward(CurrentValue), totalCoins, total_coins_text));
+                PlayerPrefs.SetInt("Total_Coins", totalCoins);
+                PlayerPrefs.Save();
+            }
 
-            totalCoins += CoinsReward(CurrentValue);
-            StartCoroutine(TextUpdater(totalCoins - CoinsReward(CurrentValue), totalCoins, total_coins_text));
-            PlayerPrefs.SetInt("Total_Coins", totalCoins);
-            PlayerPrefs.Save();
             timeTakenToSolveQuiz += CurrentValue;
 
             totalPoints += 10;
@@ -347,17 +351,20 @@ public class QuestionnaireManager : MonoBehaviour
             // reward is 4 coins
             return 4;
         }
-        else if (time > 5 && time <= 10)
+
+        if (time > 5 && time <= 10)
         {
             // reward is 3 coins
             return 3;
         }
-        else if (time > 10 && time <= 15)
+
+        if (time > 10 && time <= 15)
         {
             // reward is 2 coins
             return 2;
         }
-        else if (time > 15 && time <= 20)
+
+        if (time > 15 && time <= 20)
         {
             // reward is 1 coin
             return 1;
