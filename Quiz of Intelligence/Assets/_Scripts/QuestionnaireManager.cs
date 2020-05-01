@@ -12,12 +12,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
-[Serializable]
-public enum GameMode
-{
-    SINGLEPLAYER,
-    MULTIPLAYER
-}
 
 public class QuestionnaireManager : MonoBehaviour
 {
@@ -104,7 +98,7 @@ public class QuestionnaireManager : MonoBehaviour
 
     private int totalCoins;
 
-    public static GameMode gameMode;
+    
     private bool hintTaken = false;
 
     public static QuestionnaireManager instance = null;
@@ -118,14 +112,7 @@ public class QuestionnaireManager : MonoBehaviour
             instance = this;
         }
 
-        if (SceneManager.GetActiveScene().buildIndex == 1)
-        {
-            gameMode = GameMode.SINGLEPLAYER;
-        }
-        else if (SceneManager.GetActiveScene().buildIndex == 2)
-        {
-            gameMode = GameMode.MULTIPLAYER;
-        }
+        
     }
 
     void Start()
@@ -136,7 +123,7 @@ public class QuestionnaireManager : MonoBehaviour
         total_coins_text.text = totalCoins.ToString();
 
         // setting user name in game scene
-        playerName_text.text = UserUtils.userName;
+        playerName_text.text = FacebookAuthenticator.userName;
         // playerName_text.text = "You"
 
 
@@ -339,6 +326,36 @@ public class QuestionnaireManager : MonoBehaviour
     }
 
 
+
+    /// <summary>
+    /// Show green or red sprite, to show user answer response.
+    /// Overloading only to show correct/wrong answer sprite, only called if user answered on time 
+    /// </summary>
+    /// <param name="isCorrect">true if user answered correct</param>
+    /// <param name="index">index of option</param>
+    void AnswerResponse(bool isCorrect, int index)
+    {
+        // give user response about his answer
+        var image = options[index].transform.GetChild(1);
+        image.gameObject.SetActive(true);
+
+        if (isCorrect)
+        {
+            // its correct answer man
+            image.GetComponent<Image>().color = Color.green;
+
+            AnswerResponse(true);
+        }
+        else
+        {
+            // its wrong answer man
+            image.GetComponent<Image>().color = Color.red;
+            AnswerResponse(false);
+        }
+    }
+
+
+    
     /// <summary>
     /// To reward user with coins based on time he answered the question
     /// </summary>
@@ -375,35 +392,7 @@ public class QuestionnaireManager : MonoBehaviour
         }
     }
 
-
-    /// <summary>
-    /// Show green or red sprite, to show user answer response.
-    /// Overloading only to show correct/wrong answer sprite, only called if user answered on time 
-    /// </summary>
-    /// <param name="isCorrect">true if user answered correct</param>
-    /// <param name="index">index of option</param>
-    void AnswerResponse(bool isCorrect, int index)
-    {
-        // give user response about his answer
-        var image = options[index].transform.GetChild(1);
-        image.gameObject.SetActive(true);
-
-        if (isCorrect)
-        {
-            // its correct answer man
-            image.GetComponent<Image>().color = Color.green;
-
-            AnswerResponse(true);
-        }
-        else
-        {
-            // its wrong answer man
-            image.GetComponent<Image>().color = Color.red;
-            AnswerResponse(false);
-        }
-    }
-
-
+    
     IEnumerator WaitAndAnimateQuestionsOUT()
     {
         yield return new WaitForSeconds(0.5f);

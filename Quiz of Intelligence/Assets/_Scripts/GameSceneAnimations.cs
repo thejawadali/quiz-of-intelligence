@@ -62,10 +62,7 @@ public class GameSceneAnimations : MonoBehaviour
         resultScreen.SetActive(false);
         // first get all components to their initial position
         AllComponentsAnimations_OUT(0);
-        if (QuestionnaireManager.gameMode == GameMode.SINGLEPLAYER)
-        {
-            AllComponentsAnimations_IN(0.2f);
-        }
+        AllComponentsAnimations_IN(0.2f);
     }
 
     #region In game question text and options animations
@@ -125,10 +122,10 @@ public class GameSceneAnimations : MonoBehaviour
             // animate questions in
             AnimateQuestions_IN(0.2f);
         });
-        if (QuestionnaireManager.gameMode == GameMode.MULTIPLAYER)
-        {
-            avatar_container_other.DOAnchorPosX(-33, time);
-        }
+        // if (QuestionnaireManager.gameMode == GameMode.MULTIPLAYER)
+        // {
+        //     avatar_container_other.DOAnchorPosX(-33, time);
+        // }
     }
 
     /// <summary>
@@ -150,10 +147,10 @@ public class GameSceneAnimations : MonoBehaviour
             coins_container.DOAnchorPosY(-50, time);
             hintBtn.DOAnchorPosX(-540, time)
                 .OnComplete(() => { onComplete(); });
-            if (QuestionnaireManager.gameMode == GameMode.MULTIPLAYER)
-            {
-                avatar_container_other.DOAnchorPosX(180f, time);
-            }
+            // if (QuestionnaireManager.gameMode == GameMode.MULTIPLAYER)
+            // {
+            //     avatar_container_other.DOAnchorPosX(180f, time);
+            // }
         });
     }
 

@@ -19,7 +19,6 @@
           <e p="QuestionnaireManager.cs" t="Include" />
           <e p="ResultScreen.cs" t="Include" />
           <e p="UiManager.cs" t="Include" />
-          <e p="UserUtils.cs" t="Include" />
         </e>
         <e p="Demigiant" t="Include">
           <e p="DOTween" t="Include">

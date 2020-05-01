@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Facebook.Unity;
 using Firebase;
 using Firebase.Auth;
+using Firebase.Database;
+using Firebase.Unity.Editor;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -12,7 +14,15 @@ using UnityEngine.UI;
 public class FacebookAuthenticator : MonoBehaviour
 {
     private FirebaseAuth auth;
+    private FirebaseUser user;
+    private DatabaseReference reference;
 
+    public static bool isSinglePlayer;
+
+    public static string UID;
+    public static string userName;
+
+    private bool firebaseInitialized = false;
 
     public static FacebookAuthenticator instance = null;
 
@@ -22,6 +32,9 @@ public class FacebookAuthenticator : MonoBehaviour
         {
             instance = this;
         }
+
+        DontDestroyOnLoad(gameObject);
+        InitializeFirebase();
     }
 
     #region Initialize fireabase and facebook
@@ -35,9 +48,12 @@ public class FacebookAuthenticator : MonoBehaviour
             if (dependencyStatus == DependencyStatus.Available)
             {
                 auth = FirebaseAuth.DefaultInstance;
-
+                user = auth.CurrentUser;
+                firebaseInitialized = true;
                 // if facebook sdk in not initialized, initialize it
-
+#if UNITY_EDITOR
+                HandleDB();
+#else
                 if (!FB.IsInitialized)
                 {
                     FB.Init(InitCallback, OnHideUnity);
@@ -46,12 +62,35 @@ public class FacebookAuthenticator : MonoBehaviour
                 {
                     FB.ActivateApp();
                 }
+#endif
             }
             else
             {
                 Debug.LogError("Could not resolve all Firebase dependencies " + task);
             }
         });
+    }
+
+    void HandleDB()
+    {
+        if (firebaseInitialized)
+        {
+            // Set up the Editor before calling into the realtime database.
+            FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://fir-and-unity-testing.firebaseio.com/");
+            // Get the root reference location of the database.
+            reference = FirebaseDatabase.DefaultInstance.RootReference;
+#if UNITY_EDITOR
+
+            reference.Child("Users").Child("001").Child("userName").SetValueAsync("Unity");
+            UID = "001";
+#else
+            reference.Child("Users").Child(user.UserId).Child("userName").SetValueAsync(user.DisplayName);
+            UID = user.UserId;
+#endif
+
+            FirebaseDatabase.DefaultInstance.GetReference("Users").ValueChanged += HandleValueChanged;
+            // UserStatus(true);
+        }
     }
 
 
@@ -62,8 +101,9 @@ public class FacebookAuthenticator : MonoBehaviour
             FB.ActivateApp();
             if (FB.IsLoggedIn)
             {
-                // user is logged in
+                // user has logged in
                 // go to main menu
+                HandleDB();
                 AnimationsManager.instance.mainMenu.interactable = true;
                 AnimationsManager.instance.logoutBtn.SetActive(true);
             }
@@ -149,5 +189,17 @@ public class FacebookAuthenticator : MonoBehaviour
         {
             FB.LogOut();
         }
+    }
+
+
+    void HandleValueChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+
+        userName = args.Snapshot.Child(UID).Child("userName").GetValue(true).ToString();
     }
 }
