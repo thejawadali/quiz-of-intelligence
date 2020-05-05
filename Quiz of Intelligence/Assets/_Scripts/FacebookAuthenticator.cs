@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Facebook.Unity;
 using Firebase;
 using Firebase.Auth;
@@ -21,10 +22,12 @@ public class FacebookAuthenticator : MonoBehaviour
 
     public static string UID;
     public static string userName;
+    
 
-    private bool firebaseInitialized = false;
+    public static bool firebaseInitialized = false;
 
     public static FacebookAuthenticator instance = null;
+
 
     private void Awake()
     {
@@ -48,7 +51,6 @@ public class FacebookAuthenticator : MonoBehaviour
             if (dependencyStatus == DependencyStatus.Available)
             {
                 auth = FirebaseAuth.DefaultInstance;
-                user = auth.CurrentUser;
                 firebaseInitialized = true;
                 // if facebook sdk in not initialized, initialize it
 #if UNITY_EDITOR
@@ -83,6 +85,7 @@ public class FacebookAuthenticator : MonoBehaviour
 
             reference.Child("Users").Child("001").Child("userName").SetValueAsync("Unity");
             UID = "001";
+            // GetMereIlawaUsers();
 #else
             reference.Child("Users").Child(user.UserId).Child("userName").SetValueAsync(user.DisplayName);
             UID = user.UserId;
@@ -93,6 +96,7 @@ public class FacebookAuthenticator : MonoBehaviour
         }
     }
 
+ 
 
     void InitCallback()
     {
@@ -103,6 +107,7 @@ public class FacebookAuthenticator : MonoBehaviour
             {
                 // user has logged in
                 // go to main menu
+                user = auth.CurrentUser;
                 HandleDB();
                 AnimationsManager.instance.mainMenu.interactable = true;
                 AnimationsManager.instance.logoutBtn.SetActive(true);

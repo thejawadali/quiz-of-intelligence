@@ -9,6 +9,7 @@ public class GameSceneAnimations : MonoBehaviour
 {
     public GameObject quizScreen;
     public GameObject resultScreen;
+    
 
     #region Quiz screen items
 
@@ -62,7 +63,13 @@ public class GameSceneAnimations : MonoBehaviour
         resultScreen.SetActive(false);
         // first get all components to their initial position
         AllComponentsAnimations_OUT(0);
-        AllComponentsAnimations_IN(0.2f);
+        if (FacebookAuthenticator.isSinglePlayer)
+        {
+            AllComponentsAnimations_IN(0.2f);
+        }
+        else
+        {
+        }
     }
 
     #region In game question text and options animations
@@ -169,7 +176,7 @@ public class GameSceneAnimations : MonoBehaviour
         statsWindow.DOScale(Vector3.one, time);
         statsWindow.GetComponent<CanvasGroup>().DOFade(1, time);
         playAgainButton.DOAnchorPosX(0, time);
-        homeButton.DOAnchorPosX(0, time);//.OnComplete(() => { onComplete(); });
+        homeButton.DOAnchorPosX(0, time); //.OnComplete(() => { onComplete(); });
     }
 
     public void ResultScreenAnimations_OUT(float time, Action onComplete)

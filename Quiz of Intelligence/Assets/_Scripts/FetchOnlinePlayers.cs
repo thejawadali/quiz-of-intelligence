@@ -3,53 +3,66 @@ using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Unity.Editor;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public class FetchOnlinePlayers : MonoBehaviour
 {
-  private FirebaseAuth auth;
-  private FirebaseUser user;
-  private DatabaseReference reference;
-  private string UID;
-  // Start is called before the first frame update
-  void Start()
-  {
-    FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
-{
-  var dependencyStatus = task.Result;
-  if (dependencyStatus == DependencyStatus.Available)
-  {
-    auth = FirebaseAuth.DefaultInstance;
-    user = auth.CurrentUser;
+    [SerializeField] private GameObject loadingText;
+    [SerializeField] private GameObject fetchedPlayerPanel;
+    List<string> onlinePlayerNames = new List<string>();
+    [SerializeField] private GameObject[] onlinePlayersTickets;
+    private DatabaseReference reference;
 
-    // Set up the Editor before calling into the realtime database.
-    FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://fir-and-unity-testing.firebaseio.com/");
-    // Get the root reference location of the database.
-    reference = FirebaseDatabase.DefaultInstance.RootReference;
-    reference.Child("Users").Child(user.UserId).Child("userName").SetValueAsync(user.DisplayName);
-    UID = user.UserId;
-    // UserStatus(true);
-    FirebaseDatabase.DefaultInstance.GetReference("Users").ValueChanged += HandleValueChanged;
-  }
-});
-  }
 
-  // Update is called once per frame
-  void Update()
-  {
+    private bool dataFetched = false;
 
-  }
 
-  void GetOnlinePlayers(ValueChangedEventArgs args)
-  {
-    // var a = args.Snapshot.GetValue(true).where
-  }
-  void HandleValueChanged(object sender, ValueChangedEventArgs args)
-  {
-    if (args.DatabaseError != null)
+    // Start is called before the first frame update
+    void Start()
     {
-      Debug.LogError(args.DatabaseError.Message);
-      return;
+        loadingText.SetActive(true);
+        fetchedPlayerPanel.SetActive(false);
+        if (FacebookAuthenticator.firebaseInitialized)
+        {
+            reference = FirebaseDatabase.DefaultInstance.RootReference;
+            GetOnlinePlayersList();
+        }
+        
     }
-  }
+
+    public void GetOnlinePlayersList()
+    {
+        StartCoroutine(Wait());
+        reference.Child("Users").GetValueAsync().ContinueWith((task) =>
+        {
+            var dataSnapshots = task.Result;
+
+            foreach (var dataSnapShot in dataSnapshots.Children.ToList())
+            {
+                if (dataSnapShot.Key != FacebookAuthenticator.UID)
+                {
+                    dataFetched = true;
+                    var players = dataSnapshots.Child(dataSnapShot.Key).Child("userName").GetValue(true);
+                    onlinePlayerNames.Add(players.ToString());
+                    // Debug.LogError("Name: " + players);
+                }
+            }
+        });
+    }
+
+    IEnumerator Wait()
+    {
+        yield return new WaitUntil(() => { return dataFetched; });
+        // Debug.LogError("VAR" + onlinePlayerNames.Count);
+        for (int i = 0; i < onlinePlayerNames.Count; i++)
+        {
+            loadingText.SetActive(false);
+            fetchedPlayerPanel.SetActive(true);
+            onlinePlayersTickets[i].SetActive(true);
+            onlinePlayersTickets[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = onlinePlayerNames[i];
+        }
+    }
 }
