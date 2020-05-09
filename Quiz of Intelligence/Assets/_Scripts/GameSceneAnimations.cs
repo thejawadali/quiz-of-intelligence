@@ -69,6 +69,7 @@ public class GameSceneAnimations : MonoBehaviour
         }
         else
         {
+            // animate components in after splash
         }
     }
 

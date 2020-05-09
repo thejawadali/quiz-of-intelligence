@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using Facebook.Unity;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AnimationsManager : MonoBehaviour
 {

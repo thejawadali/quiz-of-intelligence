@@ -6,6 +6,7 @@
       <e p="Assets" t="Include">
         <e p="_Scripts" t="Include">
           <e p="AnimationsManager.cs" t="Include" />
+          <e p="ChallengeFriend.cs" t="Include" />
           <e p="DataClasses" t="Include">
             <e p="Category.cs" t="Include" />
             <e p="Question.cs" t="Include" />
@@ -15,10 +16,12 @@
           <e p="FacebookAuthenticator.cs" t="Include" />
           <e p="FetchOnlinePlayers.cs" t="Include" />
           <e p="GameSceneAnimations.cs" t="Include" />
+          <e p="InviteFriend.cs" t="Include" />
           <e p="MultiplayerSplash.cs" t="Include" />
           <e p="QuestionnaireManager.cs" t="Include" />
           <e p="ResultScreen.cs" t="Include" />
           <e p="UiManager.cs" t="Include" />
+          <e p="UnityMainThreadDispatcher.cs" t="Include" />
         </e>
         <e p="Demigiant" t="Include">
           <e p="DOTween" t="Include">

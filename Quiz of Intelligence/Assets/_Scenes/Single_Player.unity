@@ -2051,6 +2051,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cur_points_text: {fileID: 651860185}
+  textField: {fileID: 0}
   hint_coin_text: {fileID: 977407061}
   questionsCounter_GameScene: {fileID: 1969794820}
   questionText: {fileID: 1149111053}

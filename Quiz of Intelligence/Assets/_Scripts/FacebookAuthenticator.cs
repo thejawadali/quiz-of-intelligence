@@ -96,7 +96,6 @@ public class FacebookAuthenticator : MonoBehaviour
         }
     }
 
-    
 
     void InitCallback()
     {

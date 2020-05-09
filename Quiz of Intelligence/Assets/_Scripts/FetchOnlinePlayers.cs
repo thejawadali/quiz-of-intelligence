@@ -14,7 +14,10 @@ public class FetchOnlinePlayers : MonoBehaviour
     [SerializeField] private GameObject loadingText;
     [SerializeField] private GameObject fetchedPlayerPanel;
     List<string> onlinePlayerNames = new List<string>();
-    [SerializeField] private GameObject[] onlinePlayersTickets;
+    List<string> onlinePlayersIDs = new List<string>();
+    // [SerializeField] private GameObject[] onlinePlayersTickets;
+    [SerializeField] private GameObject ticketsParent;
+    
     private DatabaseReference reference;
 
 
@@ -35,25 +38,24 @@ public class FetchOnlinePlayers : MonoBehaviour
 
     public void GetOnlinePlayersList()
     {
-        StartCoroutine(Wait());
+        StartCoroutine(WaitUntilAllPlayersAreFetched());
         reference.Child("Users").GetValueAsync().ContinueWith((task) =>
         {
             var dataSnapshots = task.Result;
 
             foreach (var dataSnapShot in dataSnapshots.Children.ToList())
             {
-                if (dataSnapShot.Key != FacebookAuthenticator.UID)
-                {
-                    var players = dataSnapshots.Child(dataSnapShot.Key).Child("userName").GetValue(true);
-                    onlinePlayerNames.Add(players.ToString());
-                    // Debug.LogError("Name: " + players);
-                }
+                if (dataSnapShot.Key == FacebookAuthenticator.UID) continue;
+                var players = dataSnapshots.Child(dataSnapShot.Key).Child("userName").GetValue(true);
+                onlinePlayerNames.Add(players.ToString());
+                onlinePlayersIDs.Add(dataSnapshots.Child(dataSnapShot.Key).Key);
+                // Debug.LogError("Name: " + players);
             }
-            dataFetched = true;    
+            dataFetched = true;
         });
     }
 
-    IEnumerator Wait()
+    IEnumerator WaitUntilAllPlayersAreFetched()
     {
         yield return new WaitUntil(() => { return dataFetched; });
         // Debug.LogError("VAR" + onlinePlayerNames.Count);
@@ -61,8 +63,13 @@ public class FetchOnlinePlayers : MonoBehaviour
         {
             loadingText.SetActive(false);
             fetchedPlayerPanel.SetActive(true);
-            onlinePlayersTickets[i].SetActive(true);
-            onlinePlayersTickets[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = onlinePlayerNames[i];
+            // ticketsParent.transform.GetChild(i).gameObject
+            ticketsParent.transform.GetChild(i).gameObject.SetActive(true);
+            ticketsParent.transform.GetChild(i).gameObject.transform.GetChild(1).gameObject.name = onlinePlayersIDs[i];
+            // Debug.LogError("Name: " + onlinePlayersIDs[i]);
+            ticketsParent.transform.GetChild(i).gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = onlinePlayerNames[i];
         }
     }
+    
+    
 }
