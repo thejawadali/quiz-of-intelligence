@@ -36,7 +36,7 @@ public class UiManager : MonoBehaviour
     }
 
 
-    public void CategoryButtons(string cat)
+    public void SelectCategory(string cat)
     {
         switch (cat)
         {
@@ -72,6 +72,7 @@ public class UiManager : MonoBehaviour
                 break;
         }
 
+            
         // UserUtils.instance.UserStatus(false);
         if (FacebookAuthenticator.isSinglePlayer)
         {
@@ -81,12 +82,13 @@ public class UiManager : MonoBehaviour
         {
             SceneManager.LoadScene(2);
         }
+        // FacebookAuthenticator.instance.UserAvailabilityStatus(false);
     }
 
 
     #region GameScene button listeners
 
-    public void PlayButton(bool isSinglePlayer)
+    public void PlayGame(bool isSinglePlayer)
     {
         FacebookAuthenticator.isSinglePlayer = isSinglePlayer;
         // make main menu items non-intractable and animate category selection window in 

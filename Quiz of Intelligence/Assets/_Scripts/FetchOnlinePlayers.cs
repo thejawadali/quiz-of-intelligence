@@ -1,4 +1,5 @@
-﻿using Firebase;
+﻿using System;
+using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Unity.Editor;
@@ -30,7 +31,6 @@ public class FetchOnlinePlayers : MonoBehaviour
             reference = FirebaseDatabase.DefaultInstance.RootReference;
             GetOnlinePlayersList();
         }
-        
     }
 
     public void GetOnlinePlayersList()
@@ -44,12 +44,12 @@ public class FetchOnlinePlayers : MonoBehaviour
             {
                 if (dataSnapShot.Key != FacebookAuthenticator.UID)
                 {
-                    dataFetched = true;
                     var players = dataSnapshots.Child(dataSnapShot.Key).Child("userName").GetValue(true);
                     onlinePlayerNames.Add(players.ToString());
                     // Debug.LogError("Name: " + players);
                 }
             }
+            dataFetched = true;    
         });
     }
 

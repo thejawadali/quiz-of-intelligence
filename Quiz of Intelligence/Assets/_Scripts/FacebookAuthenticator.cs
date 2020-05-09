@@ -10,6 +10,7 @@ using Firebase.Unity.Editor;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class FacebookAuthenticator : MonoBehaviour
@@ -22,7 +23,7 @@ public class FacebookAuthenticator : MonoBehaviour
 
     public static string UID;
     public static string userName;
-    
+
 
     public static bool firebaseInitialized = false;
 
@@ -37,7 +38,7 @@ public class FacebookAuthenticator : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
-        InitializeFirebase();
+        // InitializeFirebase();
     }
 
     #region Initialize fireabase and facebook
@@ -52,6 +53,7 @@ public class FacebookAuthenticator : MonoBehaviour
             {
                 auth = FirebaseAuth.DefaultInstance;
                 firebaseInitialized = true;
+
                 // if facebook sdk in not initialized, initialize it
 #if UNITY_EDITOR
                 HandleDB();
@@ -85,18 +87,16 @@ public class FacebookAuthenticator : MonoBehaviour
 
             reference.Child("Users").Child("001").Child("userName").SetValueAsync("Unity");
             UID = "001";
-            // GetMereIlawaUsers();
 #else
             reference.Child("Users").Child(user.UserId).Child("userName").SetValueAsync(user.DisplayName);
             UID = user.UserId;
+            userName = user.DisplayName;
 #endif
-
             FirebaseDatabase.DefaultInstance.GetReference("Users").ValueChanged += HandleValueChanged;
-            // UserStatus(true);
         }
     }
 
- 
+    
 
     void InitCallback()
     {
@@ -205,6 +205,6 @@ public class FacebookAuthenticator : MonoBehaviour
             return;
         }
 
-        userName = args.Snapshot.Child(UID).Child("userName").GetValue(true).ToString();
+        // userName = args.Snapshot.Child(UID).Child("userName").GetValue(true).ToString();
     }
 }

@@ -54,9 +54,6 @@ public class ResultScreen : MonoBehaviour
         PlayerPrefs.Save();
 
         // save total points on firebase
-        // UserUtils.instance.UpdateUserProgress(QuestionnaireManager.totalPoints, QuestionnaireManager.timeTakenToSolveQuiz.ToString("0.00"));
-        //
-        // UserUtils.instance.UserStatus(true);
     }
 
     void IncrementDifficulty()
@@ -81,8 +78,15 @@ public class ResultScreen : MonoBehaviour
         GameSceneAnimations.instance.ResultScreenAnimations_OUT(0.2f, () => { SceneManager.LoadScene(1); });
     }
 
-    public void HomeButton()
+    public void HomeButton(bool resultScreen)
     {
-        GameSceneAnimations.instance.ResultScreenAnimations_OUT(0.2f, () => { SceneManager.LoadScene(0); });
+        if (resultScreen)
+        {
+            GameSceneAnimations.instance.ResultScreenAnimations_OUT(0.2f, () => { SceneManager.LoadScene(0); });
+        }
+        else
+        {
+            SceneManager.LoadScene(0);
+        }
     }
 }

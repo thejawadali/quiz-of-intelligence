@@ -25,22 +25,6 @@ public class AnimationsManager : MonoBehaviour
   void Start()
   {
     loginWindow.SetActive(false);
-
-
-    // if user's not logged in show him log in screen else go to main menu
-    // if (FB.IsLoggedIn)
-    // {
-    //     Debug.Log("user is logged in");
-    //     // go to main menu
-    //     mainMenu.interactable = true;
-    //     logoutBtn.SetActive(true);
-    // }
-    // else
-    // {
-    //     Debug.Log("user is not logged in");
-    //     loginWindow.SetActive(true);
-    //     logoutBtn.SetActive(false);
-    // }
   }
 
 

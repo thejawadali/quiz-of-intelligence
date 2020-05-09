@@ -16,18 +16,18 @@ public class DBGenerator : MonoBehaviour
         if (File.Exists(Application.persistentDataPath + Path.DirectorySeparatorChar + "Questions.json"))
         {
             // db exists, continue
-            DB_Exists();
+            DBGenerated();
         }
         else
         {
-            GenerateDB();
+            CreateDB();
         }
     }
 
     /// <summary>
     /// To create questions DB
     /// </summary>
-    void GenerateDB()
+    void CreateDB()
     {
         progressGroup.SetActive(true);
         StartCoroutine(GetRequest("https://config.nitroxis.com/questions",
@@ -43,7 +43,7 @@ public class DBGenerator : MonoBehaviour
                         File.WriteAllText(
                             Application.persistentDataPath + Path.DirectorySeparatorChar + "Questions.json",
                             response);
-                        DB_Exists();
+                        DBGenerated();
                     }
                     catch (Exception e)
                     {
@@ -65,12 +65,10 @@ public class DBGenerator : MonoBehaviour
     /// <summary>
     /// DB has already created
     /// </summary>
-    void DB_Exists()
+    void DBGenerated()
     {
         progressGroup.SetActive(false);
-#if !UNITY_EDITOR
-      FacebookAuthenticator.instance.InitializeFirebase();
-#endif
+        FacebookAuthenticator.instance.InitializeFirebase();
     }
 
 
