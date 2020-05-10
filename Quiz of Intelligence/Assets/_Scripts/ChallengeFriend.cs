@@ -19,6 +19,8 @@ public class ChallengeFriend : MonoBehaviour
 {
     private DatabaseReference _reference;
 
+    private bool requestAccepted = false;
+
     public static ChallengeFriend instance = null;
     public string token;
 
@@ -121,17 +123,21 @@ public class ChallengeFriend : MonoBehaviour
 
     public void AcceptRequest()
     {
-        Debug.LogError("User accepted request = " + token);
+        requestAccepted = true;
+        // Debug.LogError("User accepted request = " + token);
         _reference.Child("Invitations").Child(token).RemoveValueAsync();
         invitationPanel.transform.GetChild(0).gameObject.SetActive(false);
-
+        MyMsg.instance.Message("Dur fate mu", 2);
 
         // FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
+        
     }
 
     public void RejectRequest()
     {
-        Debug.LogError("User rejected request = " + token);
+        if (requestAccepted) return;
+        MyMsg.instance.Message("Lanat e", 2);
+        // Debug.LogError("User rejected request = " + token);
         _reference.Child("Invitations").Child(token).RemoveValueAsync();
         invitationPanel.transform.GetChild(0).gameObject.SetActive(false);
         // FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
