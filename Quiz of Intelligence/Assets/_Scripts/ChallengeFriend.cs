@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using DG.Tweening;
 using Firebase.Database;
+using Firebase.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -15,11 +18,22 @@ public class Invitation
     public string receiver;
 }
 
+[Serializable]
+public class Match
+{
+    public string sender_id;
+    public string receiver_id;
+
+    public string receiver_pts;
+    public string sender_pts;
+
+    public string[] questionsIDs;
+}
+
 public class ChallengeFriend : MonoBehaviour
 {
     private DatabaseReference _reference;
 
-    private bool requestAccepted = false;
 
     public static ChallengeFriend instance = null;
     public string token;
@@ -60,6 +74,38 @@ public class ChallengeFriend : MonoBehaviour
         FetchOnlinePlayers.instance.waitingPanel.SetActive(true);
     }
 
+    List<string> GreatQuestions()
+    {
+        var path = Path.Combine(Application.persistentDataPath, "Questions.json");
+        var json = File.ReadAllText(path);
+        var questionObject = JsonUtility.FromJson<Questions>(json);
+        var questionsIds = questionObject.questions.ToList().ConvertAll(q => q._id).Shuffle().Take(7);
+        return questionsIds.ToList();
+
+        // questions.ConvertAll()
+    }
+
+
+    void CreateMatch(string rec, string send)
+    {
+        try
+        {
+            
+            Match match = new Match()
+            {
+                sender_id = send,
+                receiver_id = rec,
+                questionsIDs = GreatQuestions().ToArray()
+            };
+
+            Debug.LogError("JSON: " + JsonUtility.ToJson(match));
+            _reference.Child("Matches").Push().SetRawJsonValueAsync(JsonUtility.ToJson(match));
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+        }
+    }
 
     IEnumerator CheckForRequest()
     {
@@ -72,17 +118,16 @@ public class ChallengeFriend : MonoBehaviour
                 {
                     if (task.IsCompleted)
                     {
-                        Debug.Log("Completed");
                         foreach (var dataSnapShot in task.Result.Children.ToList())
                         {
                             token = dataSnapShot.Key;
                             var invitation = JsonUtility.FromJson<Invitation>(dataSnapShot.GetRawJsonValue());
                             if (invitation.receiver == FacebookAuthenticator.UID)
                             {
-                                Debug.LogError("snap: " + dataSnapShot.GetRawJsonValue());
+                                // Debug.LogError("snap: " + dataSnapShot.GetRawJsonValue());
                                 isAvailable = false;
                                 // this request is for me
-                                Debug.LogError("I was challenged");
+                                // Debug.LogError("I was challenged");
                                 InvitationReceived(invitation);
                             }
                         }
@@ -123,11 +168,31 @@ public class ChallengeFriend : MonoBehaviour
 
     public void AcceptRequest()
     {
-        requestAccepted = true;
-        // Debug.LogError("User accepted request = " + token);
-        _reference.Child("Invitations").Child(token).RemoveValueAsync();
+        isAvailable = true;
         invitationPanel.transform.GetChild(0).gameObject.SetActive(false);
         MyMsg.instance.Message("Dur fate mu", 2);
+
+        _reference.Child("Invitations").GetValueAsync().ContinueWithOnMainThread((task) =>
+        {
+            if (task.IsCompleted)
+            {
+                foreach (var dataSnapShot in task.Result.Children.ToList())
+                {
+                    var _token = dataSnapShot.Key;
+                    var invitation = JsonUtility.FromJson<Invitation>(dataSnapShot.GetRawJsonValue());
+                    if (_token == token)
+                    {
+                        CreateMatch(invitation.receiver, invitation.sender);
+                        _reference.Child("Invitations").Child(token).RemoveValueAsync();
+                    }
+                }
+            }
+
+            else
+            {
+                Debug.LogError("Request can not completed");
+            }
+        });
 
         // FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
         
@@ -135,7 +200,7 @@ public class ChallengeFriend : MonoBehaviour
 
     public void RejectRequest()
     {
-        if (requestAccepted) return;
+        if (isAvailable) return;
         MyMsg.instance.Message("Lanat e", 2);
         // Debug.LogError("User rejected request = " + token);
         _reference.Child("Invitations").Child(token).RemoveValueAsync();

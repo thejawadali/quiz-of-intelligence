@@ -245,6 +245,7 @@ GameObject:
   - component: {fileID: 217099918}
   - component: {fileID: 217099920}
   - component: {fileID: 217099919}
+  - component: {fileID: 217099921}
   m_Layer: 0
   m_Name: Facebook Auth
   m_TagString: Untagged
@@ -317,6 +318,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9a36569f9f14cbd9df04d993586caca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &217099921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 217099915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 788194e62c654750bafb7881b2e03d19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  questionObject:
+    questions: []
+  alreadyAskedQuestion_id: []
+  questionIDs: []
+  json: 
 --- !u!1 &297222851
 GameObject:
   m_ObjectHideFlags: 0
