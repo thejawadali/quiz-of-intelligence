@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using DG.Tweening;
 using Firebase.Database;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -51,6 +52,8 @@ public class ChallengeFriend : MonoBehaviour
         Debug.LogError(JsonUtility.ToJson(inv));
 
         _reference.Child("Invitations").Push().SetRawJsonValueAsync(JsonUtility.ToJson(inv));
+
+        FetchOnlinePlayers.instance.waitingPanel.SetActive(true);
     }
 
 
@@ -89,35 +92,37 @@ public class ChallengeFriend : MonoBehaviour
         }
     }
 
-    // private void Update()
-    // {
-    //     if (Input.GetKeyDown(KeyCode.A))
-    //     {
-    //         InvitationReceived();
-    //     }
-    // }
-
     private void InvitationReceived(Invitation inv)
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
             var invitationPanel = GameObject.FindGameObjectWithTag("Canvas");
             invitationPanel.transform.GetChild(0).gameObject.SetActive(true);
+
+            _reference.Child("Users").GetValueAsync().ContinueWith((task) =>
+            {
+                if (task.IsCompleted)
+                {
+                    var challengerName = task.Result.Child(inv.sender).Child("userName").GetValue(true).ToString();
+                    UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                    {
+                        invitationPanel.transform.GetChild(0).GetChild(1).GetChild(0)
+                            .GetComponent<TextMeshProUGUI>().text = challengerName;
+                    });
+                }
+            });
         });
-        // try
-        // {
-        //     
-        // }
-        // catch (Exception e)
-        // {
-        //     Debug.LogError(e);
-        //     throw;
-        // }
     }
 
-    // private void InvitationReceived()
-    // {
-    //     var canvas = GameObject.FindGameObjectWithTag("Canvas");
-    //     canvas.transform.GetChild(0).gameObject.SetActive(true);
-    // }
+    public void AccepetRequest()
+    {
+        FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
+        Debug.LogError("User accepted request");
+    }
+
+    public void RejectRequest()
+    {
+        FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
+        Debug.LogError("User rejected request");
+    }
 }

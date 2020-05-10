@@ -11,22 +11,33 @@ using UnityEngine;
 
 public class FetchOnlinePlayers : MonoBehaviour
 {
+    public GameObject waitingPanel;
     [SerializeField] private GameObject loadingText;
     [SerializeField] private GameObject fetchedPlayerPanel;
     List<string> onlinePlayerNames = new List<string>();
+
     List<string> onlinePlayersIDs = new List<string>();
+
     // [SerializeField] private GameObject[] onlinePlayersTickets;
     [SerializeField] private GameObject ticketsParent;
-    
+
     private DatabaseReference reference;
 
 
     private bool dataFetched = false;
 
+    public static FetchOnlinePlayers instance = null;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        if (instance == null)
+        {
+            instance = this;
+        }
+
+        waitingPanel.SetActive(false);
         loadingText.SetActive(true);
         fetchedPlayerPanel.SetActive(false);
         if (FacebookAuthenticator.firebaseInitialized)
@@ -51,6 +62,7 @@ public class FetchOnlinePlayers : MonoBehaviour
                 onlinePlayersIDs.Add(dataSnapshots.Child(dataSnapShot.Key).Key);
                 // Debug.LogError("Name: " + players);
             }
+
             dataFetched = true;
         });
     }
@@ -67,9 +79,8 @@ public class FetchOnlinePlayers : MonoBehaviour
             ticketsParent.transform.GetChild(i).gameObject.SetActive(true);
             ticketsParent.transform.GetChild(i).gameObject.transform.GetChild(1).gameObject.name = onlinePlayersIDs[i];
             // Debug.LogError("Name: " + onlinePlayersIDs[i]);
-            ticketsParent.transform.GetChild(i).gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = onlinePlayerNames[i];
+            ticketsParent.transform.GetChild(i).gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text =
+                onlinePlayerNames[i];
         }
     }
-    
-    
 }
