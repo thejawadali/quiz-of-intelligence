@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using DG.Tweening;
+using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
 using TMPro;
@@ -33,13 +34,14 @@ public class Match
 public class ChallengeFriend : MonoBehaviour
 {
     private DatabaseReference _reference;
+    public static string invitationKey = null;
 
 
     public static ChallengeFriend instance = null;
-    public string token;
-
-
-    public static bool isAvailable = true;
+    public static bool responseReceived = false;
+    string token = null;
+    bool isRequested = true;
+    private bool waitingForResponse = false;
 
     private void Start()
     {
@@ -69,9 +71,13 @@ public class ChallengeFriend : MonoBehaviour
         };
         Debug.LogError(JsonUtility.ToJson(inv));
 
-        _reference.Child("Invitations").Push().SetRawJsonValueAsync(JsonUtility.ToJson(inv));
+        var key = _reference.Child("Invitations").Push();
+        key.SetRawJsonValueAsync(JsonUtility.ToJson(inv));
+        invitationKey = key.Key;
 
         FetchOnlinePlayers.instance.waitingPanel.SetActive(true);
+        waitingForResponse = true;
+        StartCoroutine(WaitForResponse());
     }
 
     List<string> GreatQuestions()
@@ -90,7 +96,6 @@ public class ChallengeFriend : MonoBehaviour
     {
         try
         {
-            
             Match match = new Match()
             {
                 sender_id = send,
@@ -107,12 +112,68 @@ public class ChallengeFriend : MonoBehaviour
         }
     }
 
+    IEnumerator WaitForResponse()
+    {
+        while (waitingForResponse)
+        {
+            yield return new WaitForSeconds(2);
+            // Debug.LogError("Key: " + invitationKey);
+            _reference.Child("Invitations").Child(invitationKey).GetValueAsync().ContinueWithOnMainThread(task =>
+            {
+                if (task.IsCompleted)
+                {
+                    Debug.LogError(task.Result.GetValue(true));
+
+                    if (!task.Result.Exists)
+                    {
+                        Debug.LogError("invitation cancelled/accepted");
+
+                        _reference.Child("Matches").GetValueAsync().ContinueWithOnMainThread(task1 =>
+                        {
+                            if (task1.IsCompleted)
+                            {
+                                var allNone = false;
+                                foreach (var dataSnapShot in task1.Result.Children.ToList())
+                                {
+                                    var match = JsonUtility.FromJson<Match>(dataSnapShot.GetRawJsonValue());
+                                    if (match.sender_id == FacebookAuthenticator.UID)
+                                    {
+                                        allNone = true;
+                                        // accepted
+                                        Debug.LogError("Request Accepted");
+                                        waitingForResponse = false;
+                                        
+                                        // start quiz
+
+                                        FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
+                                    }
+                                }
+
+                                if (!allNone)
+                                {
+                                    // hamari koi request match mein nai hai
+                                    Debug.LogError("Request Rejected");
+                                    waitingForResponse = false;
+                                    FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
+                                }
+                            }
+                        });
+                    }
+                    else
+                    {
+                        Debug.LogError("abhi invitation jaari hai");
+                    }
+                }
+            });
+        }
+    }
+
     IEnumerator CheckForRequest()
     {
         while (true)
         {
             yield return new WaitForSeconds(3);
-            if (isAvailable)
+            if (isRequested)
             {
                 _reference.Child("Invitations").GetValueAsync().ContinueWith((task) =>
                 {
@@ -125,7 +186,7 @@ public class ChallengeFriend : MonoBehaviour
                             if (invitation.receiver == FacebookAuthenticator.UID)
                             {
                                 // Debug.LogError("snap: " + dataSnapShot.GetRawJsonValue());
-                                isAvailable = false;
+                                isRequested = false;
                                 // this request is for me
                                 // Debug.LogError("I was challenged");
                                 InvitationReceived(invitation);
@@ -164,13 +225,12 @@ public class ChallengeFriend : MonoBehaviour
         });
     }
 
+
     private GameObject invitationPanel;
 
     public void AcceptRequest()
     {
-        isAvailable = true;
         invitationPanel.transform.GetChild(0).gameObject.SetActive(false);
-        MyMsg.instance.Message("Dur fate mu", 2);
 
         _reference.Child("Invitations").GetValueAsync().ContinueWithOnMainThread((task) =>
         {
@@ -180,10 +240,16 @@ public class ChallengeFriend : MonoBehaviour
                 {
                     var _token = dataSnapShot.Key;
                     var invitation = JsonUtility.FromJson<Invitation>(dataSnapShot.GetRawJsonValue());
+
                     if (_token == token)
                     {
                         CreateMatch(invitation.receiver, invitation.sender);
+                        
                         _reference.Child("Invitations").Child(token).RemoveValueAsync();
+                        
+                        // start quiz
+                        
+                        isRequested = true;
                     }
                 }
             }
@@ -195,17 +261,19 @@ public class ChallengeFriend : MonoBehaviour
         });
 
         // FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
-        
     }
 
     public void RejectRequest()
     {
-        if (isAvailable) return;
-        MyMsg.instance.Message("Lanat e", 2);
-        // Debug.LogError("User rejected request = " + token);
-        _reference.Child("Invitations").Child(token).RemoveValueAsync();
-        invitationPanel.transform.GetChild(0).gameObject.SetActive(false);
-        // FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
+        if (!isRequested)
+        {
+            MyMsg.instance.Message("Lanat e", 2);
+            // Debug.LogError("sUser rejected request = " + token);
+            isRequested = true;
+            _reference.Child("Invitations").Child(token).RemoveValueAsync();
+            invitationPanel.transform.GetChild(0).gameObject.SetActive(false);
+            FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
+        }
     }
 
     IEnumerator HideRequestPopUp()

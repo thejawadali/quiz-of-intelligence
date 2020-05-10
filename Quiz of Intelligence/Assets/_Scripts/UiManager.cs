@@ -96,6 +96,11 @@ public class UiManager : MonoBehaviour
         AnimationsManager.instance.CategoryWindowAnimation_IN(0.1f);
     }
 
+    public void playMulti()
+    {
+        SceneManager.LoadScene(2);
+    }
+
     #endregion
 
     public void BackToMenu()
