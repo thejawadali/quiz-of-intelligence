@@ -20,6 +20,7 @@ public class ChallengeFriend : MonoBehaviour
     private DatabaseReference _reference;
 
     public static ChallengeFriend instance = null;
+    public string token;
 
 
     public static bool isAvailable = true;
@@ -30,6 +31,7 @@ public class ChallengeFriend : MonoBehaviour
         {
             instance = this;
         }
+
 
         StartCoroutine(CheckForRequest());
         StartCoroutine(WaitFirebaseToLoad());
@@ -71,6 +73,7 @@ public class ChallengeFriend : MonoBehaviour
                         Debug.Log("Completed");
                         foreach (var dataSnapShot in task.Result.Children.ToList())
                         {
+                            token = dataSnapShot.Key;
                             var invitation = JsonUtility.FromJson<Invitation>(dataSnapShot.GetRawJsonValue());
                             if (invitation.receiver == FacebookAuthenticator.UID)
                             {
@@ -94,35 +97,49 @@ public class ChallengeFriend : MonoBehaviour
 
     private void InvitationReceived(Invitation inv)
     {
-        UnityMainThreadDispatcher.Instance().Enqueue(() =>
+        _reference.Child("Users").GetValueAsync().ContinueWith((task) =>
         {
-            var invitationPanel = GameObject.FindGameObjectWithTag("Canvas");
-            invitationPanel.transform.GetChild(0).gameObject.SetActive(true);
-
-            _reference.Child("Users").GetValueAsync().ContinueWith((task) =>
+            if (task.IsCompleted)
             {
-                if (task.IsCompleted)
+                var challengerName = task.Result.Child(inv.sender).Child("userName").GetValue(true).ToString();
+
+                UnityMainThreadDispatcher.Instance().Enqueue(() =>
                 {
-                    var challengerName = task.Result.Child(inv.sender).Child("userName").GetValue(true).ToString();
-                    UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                    {
-                        invitationPanel.transform.GetChild(0).GetChild(1).GetChild(0)
-                            .GetComponent<TextMeshProUGUI>().text = challengerName;
-                    });
-                }
-            });
+                    invitationPanel = GameObject.FindGameObjectWithTag("Canvas");
+
+                    invitationPanel.transform.GetChild(0).GetChild(1).GetChild(0)
+                        .GetComponent<TextMeshProUGUI>().text = challengerName;
+
+                    invitationPanel.transform.GetChild(0).gameObject.SetActive(true);
+                    StartCoroutine(HideRequestPopUp());
+                });
+            }
         });
     }
 
-    public void AccepetRequest()
+    private GameObject invitationPanel;
+
+    public void AcceptRequest()
     {
-        FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
-        Debug.LogError("User accepted request");
+        Debug.LogError("User accepted request = " + token);
+        _reference.Child("Invitations").Child(token).RemoveValueAsync();
+        invitationPanel.transform.GetChild(0).gameObject.SetActive(false);
+
+
+        // FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
     }
 
     public void RejectRequest()
     {
-        FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
-        Debug.LogError("User rejected request");
+        Debug.LogError("User rejected request = " + token);
+        _reference.Child("Invitations").Child(token).RemoveValueAsync();
+        invitationPanel.transform.GetChild(0).gameObject.SetActive(false);
+        // FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
+    }
+
+    IEnumerator HideRequestPopUp()
+    {
+        yield return new WaitForSeconds(5);
+        RejectRequest();
     }
 }
