@@ -87,6 +87,7 @@ public class FacebookAuthenticator : MonoBehaviour
 
             reference.Child("Users").Child("001").Child("userName").SetValueAsync("Unity");
             UID = "001";
+            userName = "Unity";
 #else
             reference.Child("Users").Child(user.UserId).Child("userName").SetValueAsync(user.DisplayName);
             UID = user.UserId;

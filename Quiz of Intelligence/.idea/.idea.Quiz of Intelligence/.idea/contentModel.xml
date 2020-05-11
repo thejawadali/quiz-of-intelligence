@@ -17,6 +17,7 @@
           <e p="FetchOnlinePlayers.cs" t="Include" />
           <e p="GameSceneAnimations.cs" t="Include" />
           <e p="InviteFriend.cs" t="Include" />
+          <e p="MatchManager.cs" t="Include" />
           <e p="MultiplayerSplash.cs" t="Include" />
           <e p="MyMsg.cs" t="Include" />
           <e p="QuestionnaireManager.cs" t="Include" />

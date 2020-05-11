@@ -18,12 +18,21 @@ public class ResultScreen : MonoBehaviour
 
     #region Result screen data
 
-    [Header("Result screen data")] [SerializeField]
+    [Header("Result screen data for Single Player")] [SerializeField]
     private TextMeshProUGUI totalPointsText;
 
     [SerializeField] private TextMeshProUGUI timeTakenToSolveQuiz_text;
     [SerializeField] private TextMeshProUGUI wrongAnswersText;
     [SerializeField] private TextMeshProUGUI correctAnswersText;
+
+    [Header("Result screen data for Multiplayer")] [SerializeField]
+    private TextMeshProUGUI totalPointsText_other;
+
+    [SerializeField] private TextMeshProUGUI timeTakenToSolveQuiz_text_other;
+    [SerializeField] private TextMeshProUGUI correctAnswersText_other;
+    [SerializeField] private TextMeshProUGUI wrongAnswersText_other;
+    [SerializeField] private TextMeshProUGUI nameMy;
+    [SerializeField] private TextMeshProUGUI nameother;
 
     #endregion
 
@@ -49,6 +58,7 @@ public class ResultScreen : MonoBehaviour
         wrongAnswersText.text = wrongAnswers.ToString();
         totalPointsText.text = QuestionnaireManager.totalPoints.ToString();
 
+        
 
         GameSceneAnimations.instance.ResultScreenAnimations_IN(0.2f);
         PlayerPrefs.Save();

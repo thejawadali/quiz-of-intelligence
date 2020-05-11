@@ -72,7 +72,7 @@ public class UiManager : MonoBehaviour
                 break;
         }
 
-            
+
         // UserUtils.instance.UserStatus(false);
         if (FacebookAuthenticator.isSinglePlayer)
         {
@@ -82,22 +82,24 @@ public class UiManager : MonoBehaviour
         {
             SceneManager.LoadScene(2);
         }
+
         // FacebookAuthenticator.instance.UserAvailabilityStatus(false);
     }
 
 
     #region GameScene button listeners
 
-    public void PlayGame(bool isSinglePlayer)
+    public void SinglePlayerButton()
     {
-        FacebookAuthenticator.isSinglePlayer = isSinglePlayer;
+        FacebookAuthenticator.isSinglePlayer = true;
         // make main menu items non-intractable and animate category selection window in 
         AnimationsManager.instance.mainMenu.interactable = false;
         AnimationsManager.instance.CategoryWindowAnimation_IN(0.1f);
     }
 
-    public void playMulti()
+    public void MultiPlayerButton()
     {
+        FacebookAuthenticator.isSinglePlayer = false;
         SceneManager.LoadScene(2);
     }
 

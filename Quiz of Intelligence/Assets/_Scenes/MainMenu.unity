@@ -329,11 +329,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 788194e62c654750bafb7881b2e03d19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  questionObject:
-    questions: []
-  alreadyAskedQuestion_id: []
-  questionIDs: []
-  json: 
 --- !u!1 &297222851
 GameObject:
   m_ObjectHideFlags: 0
@@ -2615,7 +2610,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1239981082}
-        m_MethodName: playMulti
+        m_MethodName: MultiPlayerButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5470,8 +5465,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1239981082}
-        m_MethodName: PlayGame
-        m_Mode: 6
+        m_MethodName: SinglePlayerButton
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -6370,6 +6365,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Invitation
+      objectReference: {fileID: 0}
+    - target: {fileID: 4244568990110166149, guid: a1be6501e835b4137abcbd5ed0ab557b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a1be6501e835b4137abcbd5ed0ab557b, type: 3}

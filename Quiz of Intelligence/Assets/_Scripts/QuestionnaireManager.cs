@@ -18,7 +18,6 @@ public class QuestionnaireManager : MonoBehaviour
     List<string> alreadyAskedQuestion_id = new List<string>();
     [SerializeField] private TextMeshProUGUI cur_points_text;
 
-    public Text textField;
 
     [Space(12)]
 
@@ -152,28 +151,14 @@ public class QuestionnaireManager : MonoBehaviour
 
 
         if (FacebookAuthenticator.isSinglePlayer)
-        {    
+        {
             for (int i = 0; i < totalQuestions; i++)
             {
                 questionIDs.Add(GenerateQuestionId());
             }
+
+            GetQuestion();
         }
-
-        GetQuestion();
-        // foreach (var VARIABLE in questionIDs)
-        // {
-        //     Debug.LogError("ID: " + VARIABLE);
-        // }
-
-        // else
-        // {
-        // var a = quesIDsForMultiplayer.ToArray();
-        //     // generate 7 questions for multi player
-        //     // for (int i = 0; i < totalQuestions; i++)
-        //     // {
-        //     //     
-        //     // }
-        // }
     }
 
 
@@ -195,12 +180,16 @@ public class QuestionnaireManager : MonoBehaviour
     /// <summary>
     /// to get questions
     /// </summary>
-    void GetQuestion()
+    public void GetQuestion()
     {
-        ques = GetQuestionByID(currentQuestion);
-        // ques = 
-        // ques = q.question
-
+        try
+        {
+            ques = GetQuestionByID(currentQuestion);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+        }
 
         // question's text
         questionText.text = ques.question + " " + ques.difficulty + " " + ques.category;
@@ -232,9 +221,19 @@ public class QuestionnaireManager : MonoBehaviour
 
     Question GetQuestionByID(int _cur)
     {
-        // Debug.LogError("Current Ques id: " + questionIDs[currentQuestion]);
+        List<string> quesList = new List<string>();
+        if (FacebookAuthenticator.isSinglePlayer)
+        {
+            quesList = questionIDs;
+        }
+        else
+        {
+            quesList = MatchManager.questionIDs;
+            // Debug.LogError("Counter: " + quesList.Count);
+        }
+
         Question question = new Question();
-        var questions = questionObject.questions.Where(ques => ques._id == questionIDs[_cur]).ToList();
+        var questions = questionObject.questions.Where(ques => ques._id == quesList[_cur]).ToList();
         question = questions[0];
         return question;
     }

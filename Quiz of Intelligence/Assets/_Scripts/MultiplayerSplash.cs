@@ -1,26 +1,44 @@
 using System;
 using System.Collections;
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class MultiplayerSplash : MonoBehaviour
 {
     public GameObject splash;
+    public GameObject friendsListPanel;
     public Image line;
     public RectTransform vsImage;
-    public RectTransform ticket_mine;
-    public RectTransform ticket_other;
+    public TextMeshProUGUI nameText_mine;
+    public TextMeshProUGUI nameText_other;
     public float time;
+
+    public static MultiplayerSplash instance = null;
 
     private void Start()
     {
+        if (instance == null)
+        {
+            instance = this;
+        }
+
+        if (ChallengeFriend.isComingFromInvitation)
+        {
+            AnimateSplash();
+        }
+    }
+
+    public void AnimateSplash()
+    {
+        friendsListPanel.SetActive(false);
         splash.SetActive(true);
         line.DOFade(1, time);
         vsImage.DOScale(new Vector2(1, 1), time).OnComplete(() =>
         {
-            ticket_mine.DOAnchorPosX(-176, time);
-            ticket_other.DOAnchorPosX(176, time).OnComplete(() => { StartCoroutine(StartQuiz()); });
+            nameText_mine.GetComponent<RectTransform>().DOAnchorPosX(0, time);
+            nameText_other.GetComponent<RectTransform>().DOAnchorPosX(0, time).OnComplete(() => { StartCoroutine(StartQuiz()); });
         });
     }
 

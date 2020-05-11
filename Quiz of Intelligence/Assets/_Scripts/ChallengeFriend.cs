@@ -10,6 +10,7 @@ using Firebase.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 [Serializable]
@@ -35,13 +36,17 @@ public class ChallengeFriend : MonoBehaviour
 {
     private DatabaseReference _reference;
     public static string invitationKey = null;
-
-
-    public static ChallengeFriend instance = null;
+    public static string matchKey = null;
+    
     public static bool responseReceived = false;
     string token = null;
-    bool isRequested = true;
+    bool requestRespond = true;
+    public static bool isComingFromInvitation = false;
+
     private bool waitingForResponse = false;
+
+    // public static bool comingFromAcception = false;
+    public static ChallengeFriend instance = null;
 
     private void Start()
     {
@@ -63,24 +68,25 @@ public class ChallengeFriend : MonoBehaviour
 
     public void InviteFriend(string recID)
     {
-        Debug.LogError(recID);
+        // Debug.LogError(recID);
         var inv = new Invitation()
         {
             receiver = recID,
             sender = FacebookAuthenticator.UID
         };
-        Debug.LogError(JsonUtility.ToJson(inv));
+        // Debug.LogError(JsonUtility.ToJson(inv));
 
         var key = _reference.Child("Invitations").Push();
         key.SetRawJsonValueAsync(JsonUtility.ToJson(inv));
         invitationKey = key.Key;
-
+        // show waiting panel to user who requests friend
         FetchOnlinePlayers.instance.waitingPanel.SetActive(true);
+        // and start waiting for response
         waitingForResponse = true;
         StartCoroutine(WaitForResponse());
     }
 
-    List<string> GreatQuestions()
+    List<string> CreateQuestionList()
     {
         var path = Path.Combine(Application.persistentDataPath, "Questions.json");
         var json = File.ReadAllText(path);
@@ -100,11 +106,13 @@ public class ChallengeFriend : MonoBehaviour
             {
                 sender_id = send,
                 receiver_id = rec,
-                questionsIDs = GreatQuestions().ToArray()
+                questionsIDs = CreateQuestionList().ToArray()
             };
 
-            Debug.LogError("JSON: " + JsonUtility.ToJson(match));
-            _reference.Child("Matches").Push().SetRawJsonValueAsync(JsonUtility.ToJson(match));
+            var key = _reference.Child("Matches").Push();
+            key.SetRawJsonValueAsync(JsonUtility.ToJson(match));
+            matchKey = key.Key;
+            // _reference.Child("Matches").Push().SetRawJsonValueAsync(JsonUtility.ToJson(match));
         }
         catch (Exception e)
         {
@@ -117,16 +125,17 @@ public class ChallengeFriend : MonoBehaviour
         while (waitingForResponse)
         {
             yield return new WaitForSeconds(2);
-            // Debug.LogError("Key: " + invitationKey);
+            // Debug.LogError("waiting for response = " + invitationKey);
+
             _reference.Child("Invitations").Child(invitationKey).GetValueAsync().ContinueWithOnMainThread(task =>
             {
                 if (task.IsCompleted)
                 {
-                    Debug.LogError(task.Result.GetValue(true));
-
                     if (!task.Result.Exists)
                     {
-                        Debug.LogError("invitation cancelled/accepted");
+                        // it means invitation has been deleted, now look for matches
+
+                        // Debug.LogError("invitation cancelled/accepted");
 
                         _reference.Child("Matches").GetValueAsync().ContinueWithOnMainThread(task1 =>
                         {
@@ -138,21 +147,26 @@ public class ChallengeFriend : MonoBehaviour
                                     var match = JsonUtility.FromJson<Match>(dataSnapShot.GetRawJsonValue());
                                     if (match.sender_id == FacebookAuthenticator.UID)
                                     {
-                                        allNone = true;
                                         // accepted
-                                        Debug.LogError("Request Accepted");
-                                        waitingForResponse = false;
-                                        
-                                        // start quiz
 
+                                        allNone = true;
+                                        MyMsg.instance.Message("Challenge Accepted", 1);
+                                        waitingForResponse = false;
+
+
+                                        // start quiz
+                                        FacebookAuthenticator.isSinglePlayer = false;
                                         FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
+                                        MultiplayerSplash.instance.AnimateSplash();
+                                        MatchManager.instance.QuestionIDs();
+
                                     }
                                 }
 
                                 if (!allNone)
                                 {
-                                    // hamari koi request match mein nai hai
-                                    Debug.LogError("Request Rejected");
+                                    // request rejected
+                                    MyMsg.instance.Message("Challenge Rejected", 1);
                                     waitingForResponse = false;
                                     FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
                                 }
@@ -161,7 +175,7 @@ public class ChallengeFriend : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogError("abhi invitation jaari hai");
+                        // Debug.LogError("abhi invitation jaari hai");
                     }
                 }
             });
@@ -173,7 +187,7 @@ public class ChallengeFriend : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(3);
-            if (isRequested)
+            if (requestRespond)
             {
                 _reference.Child("Invitations").GetValueAsync().ContinueWith((task) =>
                 {
@@ -186,7 +200,7 @@ public class ChallengeFriend : MonoBehaviour
                             if (invitation.receiver == FacebookAuthenticator.UID)
                             {
                                 // Debug.LogError("snap: " + dataSnapShot.GetRawJsonValue());
-                                isRequested = false;
+                                requestRespond = false;
                                 // this request is for me
                                 // Debug.LogError("I was challenged");
                                 InvitationReceived(invitation);
@@ -205,22 +219,19 @@ public class ChallengeFriend : MonoBehaviour
 
     private void InvitationReceived(Invitation inv)
     {
-        _reference.Child("Users").GetValueAsync().ContinueWith((task) =>
+        _reference.Child("Users").GetValueAsync().ContinueWithOnMainThread((task) =>
         {
             if (task.IsCompleted)
             {
                 var challengerName = task.Result.Child(inv.sender).Child("userName").GetValue(true).ToString();
 
-                UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                {
-                    invitationPanel = GameObject.FindGameObjectWithTag("Canvas");
+                invitationPanel = GameObject.FindGameObjectWithTag("Canvas");
 
-                    invitationPanel.transform.GetChild(0).GetChild(1).GetChild(0)
-                        .GetComponent<TextMeshProUGUI>().text = challengerName;
+                invitationPanel.transform.GetChild(0).GetChild(1).GetChild(0)
+                    .GetComponent<TextMeshProUGUI>().text = challengerName;
 
-                    invitationPanel.transform.GetChild(0).gameObject.SetActive(true);
-                    StartCoroutine(HideRequestPopUp());
-                });
+                invitationPanel.transform.GetChild(0).gameObject.SetActive(true);
+                StartCoroutine(HideRequestPopUp());
             }
         });
     }
@@ -230,8 +241,6 @@ public class ChallengeFriend : MonoBehaviour
 
     public void AcceptRequest()
     {
-        invitationPanel.transform.GetChild(0).gameObject.SetActive(false);
-
         _reference.Child("Invitations").GetValueAsync().ContinueWithOnMainThread((task) =>
         {
             if (task.IsCompleted)
@@ -244,12 +253,14 @@ public class ChallengeFriend : MonoBehaviour
                     if (_token == token)
                     {
                         CreateMatch(invitation.receiver, invitation.sender);
-                        
-                        _reference.Child("Invitations").Child(token).RemoveValueAsync();
-                        
+
                         // start quiz
-                        
-                        isRequested = true;
+                        FacebookAuthenticator.isSinglePlayer = false;
+                        invitationPanel.transform.GetChild(0).gameObject.SetActive(false);
+                        SceneManager.LoadScene(2);
+                        isComingFromInvitation = true;
+                        requestRespond = true;
+                        _reference.Child("Invitations").Child(token).RemoveValueAsync();
                     }
                 }
             }
@@ -265,20 +276,19 @@ public class ChallengeFriend : MonoBehaviour
 
     public void RejectRequest()
     {
-        if (!isRequested)
+        if (!requestRespond)
         {
-            MyMsg.instance.Message("Lanat e", 2);
-            // Debug.LogError("sUser rejected request = " + token);
-            isRequested = true;
-            _reference.Child("Invitations").Child(token).RemoveValueAsync();
+            Debug.LogError("Called reject method");
+            requestRespond = true;
             invitationPanel.transform.GetChild(0).gameObject.SetActive(false);
-            FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
+            _reference.Child("Invitations").Child(token).RemoveValueAsync();
         }
     }
 
+    // start timer as soon as receiver get invitation 
     IEnumerator HideRequestPopUp()
     {
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(10);
         RejectRequest();
     }
 }

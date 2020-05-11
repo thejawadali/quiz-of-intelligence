@@ -750,14 +750,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 796932463}
         m_MethodName: HomeButton
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
 --- !u!114 &320267517
 MonoBehaviour:
@@ -2051,7 +2051,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cur_points_text: {fileID: 651860185}
-  textField: {fileID: 0}
   hint_coin_text: {fileID: 977407061}
   questionsCounter_GameScene: {fileID: 1969794820}
   questionText: {fileID: 1149111053}
@@ -2125,6 +2124,12 @@ MonoBehaviour:
   timeTakenToSolveQuiz_text: {fileID: 565454540}
   wrongAnswersText: {fileID: 1943744634}
   correctAnswersText: {fileID: 295273853}
+  totalPointsText_other: {fileID: 0}
+  timeTakenToSolveQuiz_text_other: {fileID: 0}
+  correctAnswersText_other: {fileID: 0}
+  wrongAnswersText_other: {fileID: 0}
+  nameMy: {fileID: 0}
+  nameother: {fileID: 0}
 --- !u!1 &806400827
 GameObject:
   m_ObjectHideFlags: 0
