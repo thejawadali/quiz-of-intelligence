@@ -9,7 +9,7 @@ public class GameSceneAnimations : MonoBehaviour
 {
     public GameObject quizScreen;
     public GameObject resultScreen;
-    
+
 
     #region Quiz screen items
 
@@ -18,7 +18,6 @@ public class GameSceneAnimations : MonoBehaviour
 
     [SerializeField] private RectTransform[] answers;
     [SerializeField] private RectTransform avatar_container;
-    [SerializeField] private RectTransform avatar_container_other;
     [SerializeField] private RectTransform time_slider;
     [SerializeField] public RectTransform hintBtn;
 
@@ -35,8 +34,7 @@ public class GameSceneAnimations : MonoBehaviour
     [SerializeField] private RectTransform statsWindow;
 
     [SerializeField] private RectTransform playAgainButton;
-
-    [SerializeField] private RectTransform homeButton;
+        [SerializeField] private RectTransform homeButton;
 
     #endregion
 
@@ -176,7 +174,15 @@ public class GameSceneAnimations : MonoBehaviour
         heading.GetComponent<TextMeshProUGUI>().DOFade(1, time);
         statsWindow.DOScale(Vector3.one, time);
         statsWindow.GetComponent<CanvasGroup>().DOFade(1, time);
-        playAgainButton.DOAnchorPosX(0, time);
+        if (FacebookAuthenticator.isSinglePlayer)
+        {
+            playAgainButton.DOAnchorPosX(0, time);
+        }
+        else
+        {
+            ResultScreen.instance.resultText.GetComponent<RectTransform>().DOAnchorPosX(0, time);
+        }
+
         homeButton.DOAnchorPosX(0, time); //.OnComplete(() => { onComplete(); });
     }
 
@@ -187,7 +193,15 @@ public class GameSceneAnimations : MonoBehaviour
         heading.GetComponent<TextMeshProUGUI>().DOFade(0, time);
         statsWindow.DOScale(Vector3.zero, time);
         statsWindow.GetComponent<CanvasGroup>().DOFade(0, time);
-        playAgainButton.DOAnchorPosX(-700, time);
+        if (FacebookAuthenticator.isSinglePlayer)
+        {
+            playAgainButton.DOAnchorPosX(-700, time);
+        }
+        else
+        {
+            ResultScreen.instance.resultText.GetComponent<RectTransform>().DOAnchorPosX(-700, time);
+        }
+
         homeButton.DOAnchorPosX(700, time).OnComplete(() => { onComplete(); });
     }
 

@@ -33,6 +33,9 @@ public class ResultScreen : MonoBehaviour
     [SerializeField] private TextMeshProUGUI wrongAnswersText_other;
     [SerializeField] private TextMeshProUGUI nameMy;
     [SerializeField] private TextMeshProUGUI nameother;
+    [SerializeField] private GameObject myTag;
+    [SerializeField] private GameObject otherTag;
+    public TextMeshProUGUI resultText;
 
     #endregion
 
@@ -47,6 +50,8 @@ public class ResultScreen : MonoBehaviour
 
         wrongAnswers = 0;
         correctAnswers = 0;
+        myTag.SetActive(false);
+        otherTag.SetActive(false);
     }
 
     public void GameOver()
@@ -58,7 +63,18 @@ public class ResultScreen : MonoBehaviour
         wrongAnswersText.text = wrongAnswers.ToString();
         totalPointsText.text = QuestionnaireManager.totalPoints.ToString();
 
-        
+
+        if (!FacebookAuthenticator.isSinglePlayer)
+        {
+            var correctAnswers_other = 2;
+            nameMy.text = FacebookAuthenticator.userName;
+            nameother.text = "Other Man";
+            timeTakenToSolveQuiz_text_other.text = 12.2f + "secs";
+            correctAnswersText_other.text = correctAnswers_other.ToString();
+            wrongAnswersText_other.text = 5.ToString();
+            totalPointsText_other.text = 2.ToString();
+            CheckWinner(correctAnswers, correctAnswers_other);
+        }
 
         GameSceneAnimations.instance.ResultScreenAnimations_IN(0.2f);
         PlayerPrefs.Save();
@@ -66,18 +82,42 @@ public class ResultScreen : MonoBehaviour
         // save total points on firebase
     }
 
+    void CheckWinner(int myPts, int otherPts)
+    {
+        if (myPts > otherPts)
+        {
+            // i m winner
+            myTag.SetActive(true);
+            resultText.text = "You wonnn!";
+        }
+        else if (myPts < otherPts)
+        {
+            // other is winnner
+            resultText.text = "You Lose!";
+            otherTag.SetActive(true);
+        }
+        else
+        {
+            resultText.text = "Match Tied!";
+            // tied
+        }
+    }
+
     void IncrementDifficulty()
     {
-        // check if all answers are correct and user solve quiz with in required time
-        var requiredTime = (float) (QuestionnaireManager.totalQuestions * 20) / 2;
-        if (correctAnswers >= QuestionnaireManager.totalQuestions &&
-            QuestionnaireManager.timeTakenToSolveQuiz <= requiredTime)
+        if (FacebookAuthenticator.isSinglePlayer)
         {
-            if (QuestionnaireManager.difficulty < 3)
+            // check if all answers are correct and user solve quiz with in required time
+            var requiredTime = (float) (QuestionnaireManager.totalQuestions * 20) / 2;
+            if (correctAnswers >= QuestionnaireManager.totalQuestions &&
+                QuestionnaireManager.timeTakenToSolveQuiz <= requiredTime)
             {
-                QuestionnaireManager.difficulty++;
-                PlayerPrefs.SetInt("DIFFICULTY", QuestionnaireManager.difficulty);
-                PlayerPrefs.Save();
+                if (QuestionnaireManager.difficulty < 3)
+                {
+                    QuestionnaireManager.difficulty++;
+                    PlayerPrefs.SetInt("DIFFICULTY", QuestionnaireManager.difficulty);
+                    PlayerPrefs.Save();
+                }
             }
         }
     }
