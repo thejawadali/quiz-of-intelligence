@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
+using Firebase.Extensions;
 using Firebase.Unity.Editor;
 using TMPro;
 using UnityEngine;
@@ -15,6 +17,7 @@ public class ResultScreen : MonoBehaviour
     public static int wrongAnswers;
     public static int correctAnswers;
 
+    public GameObject waitingPanel_gameOver;
 
     #region Result screen data
 
@@ -39,6 +42,10 @@ public class ResultScreen : MonoBehaviour
 
     #endregion
 
+
+    private DatabaseReference _reference;
+
+
     public static ResultScreen instance = null;
 
     private void Awake()
@@ -47,6 +54,12 @@ public class ResultScreen : MonoBehaviour
         {
             instance = this;
         }
+    }
+
+    private void Start()
+    {
+        _reference = FirebaseDatabase.DefaultInstance.RootReference;
+        waitingPanel_gameOver.SetActive(false);
 
         wrongAnswers = 0;
         correctAnswers = 0;
@@ -56,6 +69,20 @@ public class ResultScreen : MonoBehaviour
 
     public void GameOver()
     {
+        if (!FacebookAuthenticator.isSinglePlayer)
+        {
+            nameMy.text = FacebookAuthenticator.userName;
+            SendStatsToServer();
+
+            waiting = true;
+            waitingPanel_gameOver.SetActive(true);
+            StartCoroutine(WaitForOpponentToFinish());
+        }
+        else
+        {
+            GameSceneAnimations.instance.ResultScreenAnimations_IN(0.2f);
+        }
+
         IncrementDifficulty();
 
         timeTakenToSolveQuiz_text.text = QuestionnaireManager.timeTakenToSolveQuiz.ToString("0.00") + " secs";
@@ -64,23 +91,129 @@ public class ResultScreen : MonoBehaviour
         totalPointsText.text = QuestionnaireManager.totalPoints.ToString();
 
 
-        if (!FacebookAuthenticator.isSinglePlayer)
-        {
-            var correctAnswers_other = 2;
-            nameMy.text = FacebookAuthenticator.userName;
-            nameother.text = "Other Man";
-            timeTakenToSolveQuiz_text_other.text = 12.2f + "secs";
-            correctAnswersText_other.text = correctAnswers_other.ToString();
-            wrongAnswersText_other.text = 5.ToString();
-            totalPointsText_other.text = 2.ToString();
-            CheckWinner(correctAnswers, correctAnswers_other);
-        }
-
-        GameSceneAnimations.instance.ResultScreenAnimations_IN(0.2f);
         PlayerPrefs.Save();
-
-        // save total points on firebase
     }
+
+    private bool waiting = false;
+
+    IEnumerator WaitForOpponentToFinish()
+    {
+        while (waiting)
+        {
+            yield return new WaitForSeconds(3);
+            _reference.Child("Matches").GetValueAsync().ContinueWithOnMainThread(task =>
+            {
+                if (task.IsCompleted)
+                {
+                    foreach (var dataSnapshot in task.Result.Children.ToList())
+                    {
+                        var match = JsonUtility.FromJson<Match>(dataSnapshot.GetRawJsonValue());
+                        if (ChallengeFriend.isComingFromInvitation)
+                        {
+                            // receiver   
+                            if (match.sender_completed)
+                            {
+                                waiting = false;
+                                Debug.LogError("He also completed");
+                                GetOpponentsScores();
+                                // show result screen
+                            }
+                        }
+                        else
+                        {
+                            // sender
+                            if (match.receiver_completed)
+                            {
+                                // show result screen
+                                waiting = false;
+                                GetOpponentsScores();
+                                // Debug.LogError("He also completed");
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+
+    void SendStatsToServer()
+    {
+        var db = _reference.Child("Matches").Child(ChallengeFriend.matchKey);
+        if (ChallengeFriend.isComingFromInvitation)
+        {
+            //  receiver
+
+            db.Child("receiver_completed").SetValueAsync(true);
+            db.Child("receiver_pts").SetValueAsync(QuestionnaireManager.totalPoints);
+            db.Child("receiver_time").SetValueAsync(QuestionnaireManager.timeTakenToSolveQuiz);
+            db.Child("receiver_cAns").SetValueAsync(correctAnswers);
+            db.Child("receiver_wAns").SetValueAsync(wrongAnswers);
+        }
+        else
+        {
+            // sender
+
+            db.Child("sender_completed").SetValueAsync(true);
+            db.Child("sender_pts").SetValueAsync(QuestionnaireManager.totalPoints);
+            db.Child("sender_time").SetValueAsync(QuestionnaireManager.timeTakenToSolveQuiz);
+            db.Child("sender_cAns").SetValueAsync(correctAnswers);
+            db.Child("sender_wAns").SetValueAsync(wrongAnswers);
+        }
+    }
+
+
+    void GetOpponentsScores()
+    {
+        Match myMatch = new Match();
+        var time = 0.0f;
+        var pts = 0;
+        var cAns = 0;
+        var wAns = 0;
+
+        _reference.Child("Matches").GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                foreach (var dataSnapshot in task.Result.Children.ToList())
+                {
+                    var token = dataSnapshot.Key;
+                    if (token == ChallengeFriend.matchKey)
+                    {
+                        myMatch = JsonUtility.FromJson<Match>(dataSnapshot.GetRawJsonValue());
+                        if (ChallengeFriend.isComingFromInvitation)
+                        {
+                            // i m receiver, you should get sender
+                            time = myMatch.sender_time;
+                            pts = myMatch.sender_pts;
+                            cAns = myMatch.sender_cAns;
+                            wAns = myMatch.sender_wAns;
+                        }
+                        else
+                        {
+                            // i m sender, you should get receiver
+                            time = myMatch.receiver_time;
+                            pts = myMatch.receiver_pts;
+                            cAns = myMatch.receiver_cAns;
+                            wAns = myMatch.receiver_wAns;
+                        }
+
+                        CheckWinner(QuestionnaireManager.totalPoints, pts);
+                        timeTakenToSolveQuiz_text_other.text = time.ToString("0.00") + " secs";
+                        totalPointsText_other.text = pts.ToString();
+                        correctAnswersText_other.text = cAns.ToString();
+                        wrongAnswersText_other.text = wAns.ToString();
+                        nameother.text = MatchManager.nameOther;
+                        GameSceneAnimations.instance.ResultScreenAnimations_IN(0.2f);
+                        waitingPanel_gameOver.SetActive(false);
+                        _reference.Child("Matches").Child(token).RemoveValueAsync();
+                        _reference.Child("Matches").RemoveValueAsync();
+                    }
+                }
+            }
+        });
+    }
+
 
     void CheckWinner(int myPts, int otherPts)
     {

@@ -192,8 +192,8 @@ public class QuestionnaireManager : MonoBehaviour
         }
 
         // question's text
-        questionText.text = ques.question + " " + ques.difficulty + " " + ques.category;
-        // questionText.text = ques.question;
+        // questionText.text = ques.question + " " + ques.difficulty + " " + ques.category;
+        questionText.text = ques.question;
         // shuffle answers list
         ques.answers = ques.answers.Shuffle().ToList();
         // answers text
@@ -210,10 +210,10 @@ public class QuestionnaireManager : MonoBehaviour
             }
 
             // its temp
-            if (ques.answers[i].isCorrect)
-            {
-                options[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text += "\t c";
-            }
+            // if (ques.answers[i].isCorrect)
+            // {
+            //     options[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text += "\t c";
+            // }
         }
 
         questionsCounter_GameScene.text = (currentQuestion + 1) + "/" + totalQuestions;

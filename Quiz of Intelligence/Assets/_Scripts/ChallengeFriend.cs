@@ -20,16 +20,31 @@ public class Invitation
     public string receiver;
 }
 
+
 [Serializable]
 public class Match
 {
     public string sender_id;
     public string receiver_id;
 
-    public string receiver_pts;
-    public string sender_pts;
+    public int receiver_pts;
+    public int sender_pts;
+
+    public bool sender_completed;
+    public bool receiver_completed;
+
+    public int sender_cAns;
+    public int receiver_cAns;
+
+    public int sender_wAns;
+    public int receiver_wAns;
+
+    public float sender_time;
+    public float receiver_time;
 
     public string[] questionsIDs;
+
+    
 }
 
 public class ChallengeFriend : MonoBehaviour
@@ -37,7 +52,7 @@ public class ChallengeFriend : MonoBehaviour
     private DatabaseReference _reference;
     public static string invitationKey = null;
     public static string matchKey = null;
-    
+
     public static bool responseReceived = false;
     string token = null;
     bool requestRespond = true;
@@ -148,6 +163,7 @@ public class ChallengeFriend : MonoBehaviour
                                     if (match.sender_id == FacebookAuthenticator.UID)
                                     {
                                         // accepted
+                                        matchKey = dataSnapShot.Key;
 
                                         allNone = true;
                                         MyMsg.instance.Message("Challenge Accepted", 1);
@@ -159,7 +175,6 @@ public class ChallengeFriend : MonoBehaviour
                                         FetchOnlinePlayers.instance.waitingPanel.SetActive(false);
                                         MultiplayerSplash.instance.AnimateSplash();
                                         MatchManager.instance.QuestionIDs();
-
                                     }
                                 }
 
