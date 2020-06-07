@@ -74,14 +74,8 @@ public class UiManager : MonoBehaviour
 
 
         // UserUtils.instance.UserStatus(false);
-        if (FacebookAuthenticator.isSinglePlayer)
-        {
-            SceneManager.LoadScene(1);
-        }
-        else
-        {
-            SceneManager.LoadScene(2);
-        }
+        SceneManager.LoadScene(1);
+
 
         // FacebookAuthenticator.instance.UserAvailabilityStatus(false);
     }

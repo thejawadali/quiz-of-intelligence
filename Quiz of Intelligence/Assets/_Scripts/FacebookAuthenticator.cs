@@ -98,6 +98,30 @@ public class FacebookAuthenticator : MonoBehaviour
     }
 
 
+    void DeleteFromOnlinePlayers()
+    {
+        if (firebaseInitialized)
+        {
+#if UNITY_EDITOR
+
+            reference.Child("Users").Child("001").RemoveValueAsync();
+#else
+            reference.Child("Users").Child(user.UserId).RemoveValueAsync();
+#endif
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        DeleteFromOnlinePlayers();
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        if (pauseStatus)
+            DeleteFromOnlinePlayers();
+    }
+
     void InitCallback()
     {
         if (FB.IsInitialized)
@@ -110,13 +134,13 @@ public class FacebookAuthenticator : MonoBehaviour
                 user = auth.CurrentUser;
                 HandleDB();
                 AnimationsManager.instance.mainMenu.interactable = true;
-                AnimationsManager.instance.logoutBtn.SetActive(true);
+                // AnimationsManager.instance.logoutBtn.SetActive(true);
             }
             else
             {
                 // user is not logged in
                 AnimationsManager.instance.loginWindow.SetActive(true);
-                AnimationsManager.instance.logoutBtn.SetActive(false);
+                // AnimationsManager.instance.logoutBtn.SetActive(false);
             }
         }
         else
@@ -176,7 +200,7 @@ public class FacebookAuthenticator : MonoBehaviour
 
             AnimationsManager.instance.loginWindow.SetActive(false);
             AnimationsManager.instance.mainMenu.interactable = true;
-            AnimationsManager.instance.logoutBtn.SetActive(true);
+            // AnimationsManager.instance.logoutBtn.SetActive(true);
 
             FirebaseUser newUser = task.Result;
 
@@ -186,15 +210,6 @@ public class FacebookAuthenticator : MonoBehaviour
     }
 
     #endregion
-
-    // TODO: delete this functionality in future
-    public void FB_Logout()
-    {
-        if (FB.IsLoggedIn)
-        {
-            FB.LogOut();
-        }
-    }
 
 
     void HandleValueChanged(object sender, ValueChangedEventArgs args)

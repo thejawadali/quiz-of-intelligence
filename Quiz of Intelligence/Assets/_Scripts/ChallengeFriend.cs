@@ -63,7 +63,7 @@ public class ChallengeFriend : MonoBehaviour
     // public static bool comingFromAcception = false;
     public static ChallengeFriend instance = null;
 
-    private void Start()
+    public void Start()
     {
         if (instance == null)
         {
@@ -99,42 +99,24 @@ public class ChallengeFriend : MonoBehaviour
         // and start waiting for response
         waitingForResponse = true;
         StartCoroutine(WaitForResponse());
+        StartCoroutine(RequestTimeOut());
     }
 
-    List<string> CreateQuestionList()
+
+    IEnumerator RequestTimeOut()
     {
-        var path = Path.Combine(Application.persistentDataPath, "Questions.json");
-        var json = File.ReadAllText(path);
-        var questionObject = JsonUtility.FromJson<Questions>(json);
-        var questionsIds = questionObject.questions.ToList().ConvertAll(q => q._id).Shuffle().Take(7);
-        return questionsIds.ToList();
-
-        // questions.ConvertAll()
+        yield return new WaitForSeconds(60);
+        CancelRequest();
     }
-
-
-    void CreateMatch(string rec, string send)
+    
+    public void CancelRequest()
     {
-        try
-        {
-            Match match = new Match()
-            {
-                sender_id = send,
-                receiver_id = rec,
-                questionsIDs = CreateQuestionList().ToArray()
-            };
-
-            var key = _reference.Child("Matches").Push();
-            key.SetRawJsonValueAsync(JsonUtility.ToJson(match));
-            matchKey = key.Key;
-            // _reference.Child("Matches").Push().SetRawJsonValueAsync(JsonUtility.ToJson(match));
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e);
-        }
+        waitingForResponse = false;
+        _reference.Child("Invitations").Child(token).RemoveValueAsync();
+        
     }
 
+  
     IEnumerator WaitForResponse()
     {
         while (waitingForResponse)
@@ -262,9 +244,9 @@ public class ChallengeFriend : MonoBehaviour
             {
                 foreach (var dataSnapShot in task.Result.Children.ToList())
                 {
+                    // invitation key
                     var _token = dataSnapShot.Key;
                     var invitation = JsonUtility.FromJson<Invitation>(dataSnapShot.GetRawJsonValue());
-
                     if (_token == token)
                     {
                         CreateMatch(invitation.receiver, invitation.sender);
@@ -300,10 +282,47 @@ public class ChallengeFriend : MonoBehaviour
         }
     }
 
-    // start timer as soon as receiver get invitation 
+    // start timer as soon as receiver gets invitation and hide request pop up after 10 secs
     IEnumerator HideRequestPopUp()
     {
         yield return new WaitForSeconds(10);
         RejectRequest();
     }
+    
+    
+    List<string> CreateQuestionList()
+    {
+        var path = Path.Combine(Application.persistentDataPath, "Questions.json");
+        var json = File.ReadAllText(path);
+        var questionObject = JsonUtility.FromJson<Questions>(json);
+        var questionsIds = questionObject.questions.ToList().ConvertAll(q => q._id).Shuffle().Take(7);
+        return questionsIds.ToList();
+
+        // questions.ConvertAll()
+    }
+
+
+    void CreateMatch(string rec, string send)
+    {
+        try
+        {
+            Match match = new Match()
+            {
+                sender_id = send,
+                receiver_id = rec,
+                questionsIDs = CreateQuestionList().ToArray()
+            };
+
+            var key = _reference.Child("Matches").Push();
+            key.SetRawJsonValueAsync(JsonUtility.ToJson(match));
+            matchKey = key.Key;
+            // _reference.Child("Matches").Push().SetRawJsonValueAsync(JsonUtility.ToJson(match));
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+        }
+    }
+
+    
 }

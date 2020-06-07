@@ -26,10 +26,11 @@ public class MatchManager : MonoBehaviour
 
         _reference = FirebaseDatabase.DefaultInstance.RootReference;
 
+        
+        // if you are receiver, start game directly
         if (ChallengeFriend.isComingFromInvitation)
         {
             QuestionIDs();
-            // Debug.LogError("Iscoming from invitation");
         }
     }
 

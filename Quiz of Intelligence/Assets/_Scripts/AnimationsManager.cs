@@ -6,12 +6,14 @@ using Facebook.Unity;
 using UnityEngine;
 using UnityEngine.UI;
 
+
+// to handle main menu animations
 public class AnimationsManager : MonoBehaviour
 {
   public CanvasGroup mainMenu;
   public CanvasGroup categoryWindow;
   public GameObject loginWindow;
-  public GameObject logoutBtn;
+  // public GameObject logoutBtn;
 
   public static AnimationsManager instance = null;
 

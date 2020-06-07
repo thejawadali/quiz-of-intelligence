@@ -13,4 +13,9 @@ public class RequestResponse : MonoBehaviour
     {
         ChallengeFriend.instance.RejectRequest();
     }
+
+    public void CancelRequest()
+    {
+        ChallengeFriend.instance.CancelRequest();
+    }
 }

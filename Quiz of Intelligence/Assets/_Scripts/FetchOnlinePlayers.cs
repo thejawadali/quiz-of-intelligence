@@ -70,6 +70,12 @@ public class FetchOnlinePlayers : MonoBehaviour
     IEnumerator WaitUntilAllPlayersAreFetched()
     {
         yield return new WaitUntil(() => { return dataFetched; });
+        if (onlinePlayerNames.Count < 1)
+        {
+            // no player is online
+            Debug.LogError("No Player is onl");
+            loadingText.GetComponent<TextMeshProUGUI>().text = "Can't find any opponent";
+        }
         // Debug.LogError("VAR" + onlinePlayerNames.Count);
         for (int i = 0; i < onlinePlayerNames.Count; i++)
         {

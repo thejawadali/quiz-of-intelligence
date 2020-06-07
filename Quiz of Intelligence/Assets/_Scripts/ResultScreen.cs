@@ -58,13 +58,16 @@ public class ResultScreen : MonoBehaviour
 
     private void Start()
     {
-        _reference = FirebaseDatabase.DefaultInstance.RootReference;
-        waitingPanel_gameOver.SetActive(false);
-
         wrongAnswers = 0;
         correctAnswers = 0;
-        myTag.SetActive(false);
-        otherTag.SetActive(false);
+        if (!FacebookAuthenticator.isSinglePlayer)
+        {
+            _reference = FirebaseDatabase.DefaultInstance.RootReference;
+            waitingPanel_gameOver.SetActive(false);
+
+            myTag.SetActive(false);
+            otherTag.SetActive(false);
+        }
     }
 
     public void GameOver()
@@ -265,7 +268,13 @@ public class ResultScreen : MonoBehaviour
     {
         if (resultScreen)
         {
-            GameSceneAnimations.instance.ResultScreenAnimations_OUT(0.2f, () => { SceneManager.LoadScene(0); });
+            GameSceneAnimations.instance.ResultScreenAnimations_OUT(0.2f, () =>
+            {
+                // Destroy(GameObject.FindGameObjectWithTag("Uni"));
+                ChallengeFriend.isComingFromInvitation = false;
+                SceneManager.LoadScene(0); 
+                
+            });
         }
         else
         {
